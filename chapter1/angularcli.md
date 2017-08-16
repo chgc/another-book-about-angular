@@ -72,10 +72,58 @@ Angular CLI 是 Angular Team 與社群一起合作創造出來的工具，Angula
 * **prefix**
 
   * `--prefix` (alias: `-p`)  預設值: app
-  * 給所有 `component selector` 使用的前綴詞
+  * 給 `component selector` 使用的前綴詞
   * 可事後由 `.angular-cli.json` 設定
 
- 
+* **routing**
+
+  * `--routing`  預設值：`false`
+  * 建立路由模組
+
+* **skip-commit**
+
+  * `--skip-commit` (alias: `-sc`)  預設值：`false`
+  * 忽略第一次建立時的 git 簽入動作
+
+* **skip-git**
+
+  * `--skip-git` (alias: `-sg`) 預設值：`false`
+  * 不建立 git Repository
+
+* **skip-install**
+
+  * `--skip-install` (alias: `-si`) *預設值：`false`*
+  * 建立新專案時，不執行安裝套件動作 (install packages)
+
+* **skip-test**
+
+  * `--skip-tests (aliases: `-st) 預設值：`false`
+  * 不建立 `spec` 測試檔案
+  * 不包含 `e2e` 測試功能
+
+* **source-dir**
+
+  * `--source-dir` (alias: `-sd`) 預設值： src
+  * 主專案程式存放的資料夾名稱
+  * 可事後由 `.angular-cli.json` 設定 (app[0].root)
+
+* **style**
+
+  * `--style` 預設值：css
+  * 支援以下格式
+    * css
+    * scss
+    * less
+    * sass
+    * styl (stylus)
+  * 可事後由 `.angular-cli.json` 設定 (defaults.styleExt)
+
+* **verbose**
+
+  * `--verbose` (alias: `-v`) 預設值：`false`
+  * 顯示更多輸出資訊
+
+
 
 ## serve
 
