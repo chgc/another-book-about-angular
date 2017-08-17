@@ -23,11 +23,15 @@ Angular CLI 是 Angular Team 與社群一起合作創造出來的工具，Angula
 
 當看到這個畫面時，就表示 Angular CLI 安裝成功了
 
+
+
 # 指令篇
 
 以下命令都需要透過 `ng` 使用，範例如下
 
 > ng <command>
+
+
 
 ## new
 
@@ -124,6 +128,8 @@ Angular CLI 是 Angular Team 與社群一起合作創造出來的工具，Angula
   * 顯示更多輸出資訊
 
 
+
+
 ## serve
 
 `ng serve` 指令會進行專案建置並啟動網頁伺服器
@@ -199,6 +205,7 @@ Angular CLI 是 Angular Team 與社群一起合作創造出來的工具，Angula
 * **poll**
   * `--poll`
   * 設定檢查檔案異動頻率 (微秒)
+  * 屬 webpack watchOptions 參數 (https://webpack.js.org/configuration/watch/#watchoptions)
 * **progress**
   * `--progress` (aliases: `-pr`) 預設值: true
   * 顯示建置進度
@@ -225,19 +232,288 @@ Angular CLI 是 Angular Team 與社群一起合作創造出來的工具，Angula
 
 當執行 `ng serve` 時，所有的過程都是在記憶體裡完成的，所以不會有實體檔案的輸出。
 
+
+
 ## generate
+
+`ng generate [name]` 建立指定的藍圖範本
+
+### 預設範本
+
+* class
+* component
+* directive
+* enum
+* guard
+* interface
+* module
+* pipe
+* service
+
+### 參數
+
+* **dry-run**
+  * `--dry-run` (aliases: `-d`) 預設值: false
+  * 顯示會產生與異動的檔案內容，但不會真正的執行
+* **lint-fix**
+  * `--lint-fix` (aliases: `-lf`)
+  * 在建立範本後使用 `lint` 修正樣式
+  * 可於 `.angular-cli.json` 內設定為預設選項 (`defaults.lintFix`)。
+* **verbose**
+  * `--verbose` (aliases: `-v`) 預設值: false
+  * 顯示更多輸出資訊
+* **collection**
+  * `--collection` (aliases: `-c`) 預設值 : @schematics/angular
+  * 設定要使用的 `Schematics` 集合
+
+
 
 ## build
 
+`ng build` 建置專案並輸出到資料夾
+
+### 建置專案
+
+> ng build
+
+預設專案輸出的資料夾是 `dist/`。
+
+所有建置或是服務命令 (`ng build/serve/e2e/`)，預設都會移除 `dist/` 資料夾，這行為可以透過 `--no-delete-output-path` 或 `--delete-output-path=false` 的參數停用
+
+### 建置類型與環境變數檔案 (Build Targets and Environment Files)
+
+`ng build` 可以預設可以指定兩種建置目標 ( `--target=production` 或 `--target=development`)，並且使用相對應的環境變數檔案 (`--environment=prod` 或 `--environment=dev`)。預設目標是 `development`
+
+環境變數與建置目標的對應檔，可以在  `.angular-cli.json` 內找到
+
+```json
+"environmentSource": "environments/environment.ts",
+"environments": {
+  "dev": "environments/environment.ts",
+  "prod": "environments/environment.prod.ts"
+}
+```
+
+以下的使用的參數也適用於 `ng serve`，如果沒有特定指定，預設對應是 `dev` 對 `development`，`prod` 對 `production`。
+
+```
+# these are equivalent
+ng build --target=production --environment=prod
+ng build --prod --env=prod
+ng build --prod
+# and so are these
+ng build --target=development --environment=dev
+ng build --dev --e=dev
+ng build --dev
+ng build
+```
+
+當然，也可以自行新增環境變數及目標
+
+* 建立 `src/environments/environment.NAME.ts` 檔案
+* 於 `.angular-cli.json` 新增`{ "NAME": 'src/environments/environment.NAME.ts' }` 至 `apps[0].environments` 區塊內 。
+* 在 `build/serve` 時可以過 `--env=Name` 參數設定來使用新增的環境變數
+
+### Base Tag
+
+`build` 提供方法 (`--base-href your-url`)可以從外部修改 `index.html` 的 `<base href="/">` 標籤
+
+```
+# Sets base tag href to /myUrl/ in your index.html
+ng build --base-href /myUrl/
+ng build --bh /myUrl/
+```
+
+### 合併及瘦身 (Tree-Shaking)
+
+當要部署專案到正式環境時，一定要使用 `production` 模式，`production` 模式會讓專案的檔案大小縮到最小，而且執行速度也會因為 `AOT` 的關係而大幅提升。以下是 `development` 與 `production` 的開啟功能比較
+
+| 參數               | --dev | --prod |
+| :--------------- | :---: | :----: |
+| --aot            | false |  true  |
+| --environment    |  dev  |  prod  |
+| --output-hashing | media |  all   |
+| --sourcemaps     | true  | false  |
+| --extract-css    | false |  true  |
+| --named-chunks   | true  | false  |
+
+`--prod`還會另外執行以下幾件事情
+
+1. 如果 `.angular-cli.json` 有設定使用 `service-worker`時，CLI 會加入 `service-worker`
+2. 替換 `process.env.NODE_ENV` 的設定為 `production`
+3. 執行 `UglifyJS`
+
+### Service Worker
+
+目前尚屬**實驗性質**的功能，只能在 `production` 建置模式下使用。如要啟動，需要執行以下指令
+
+```
+npm install @angular/service-worker --save
+ng set apps.0.serviceWorker=true
+```
+
+於 `--prod` 建置目標下，檔案會自動建立並載入。
+
+### 參數
+
+* **aot**
+  * `--aot` 預設值: false
+  * 建置時使用 `Ahead of Time` 編譯模式
+* **app**
+  * `--app` (aliases: `-a`)
+  * 使用名稱 (name) 或位置 (index) 來指定要建置的專案設定
+* **base-href**
+  * `--base-href` (aliases: `-bh`)
+  * 設定 `<base>` 網址
+* **deploy_url**
+  * `--deploy-url` (aliases: `-d`)
+  * 設定部署網址
+* **environment**
+  - `--environment` (aliases: `-e`)
+  - 指定環境變數檔
+* **extract-css**
+  - `--extract-css` (aliases: `-ec`)
+  - 是否將 `global style`內設定的 css 檔案建置為 css 檔案而非 js 檔案
+* **i18n-file**
+  - `--i18n-file`
+  - 指定多國語系檔位置
+* **i18n-format**
+  - `--i18n-format`
+  - 設定多國語系檔格式
+* **locale**
+  - `--locale`
+  - 設定語系
+* **output-hashing**
+  - `--output-hashing` (aliases: `-oh`)
+  - 設定輸出檔案檔名模式(cache-busting hashing mode)，可使用的參數如下
+    - none
+    - all
+    - media
+    - bundles
+* **output-path**
+  - `--output-path` (aliases: `-op`) 
+  - 設定建置輸出位置
+* **poll**
+  - `--poll`
+  - 設定檢查檔案異動頻率 (微秒)
+  - 屬 webpack watchOptions 參數 (https://webpack.js.org/configuration/watch/#watchoptions)
+* **progress**
+  - `--progress` (aliases: `-pr`) 預設值: true
+  - 顯示建置進度
+* **sourcemap**
+  - `--sourcemap` (aliases: `-sm`, `sourcemaps`)
+  - 輸出 souremap
+* **stats-json**
+  * `--stats-json`
+  * 產生 `stats.json` 檔案，可以利用 `wepack-bundle-analyzer` 或  *https://webpack.github.io/analyse* 做分析
+* **target**
+  - `--target` (aliases: `-t`, `-dev`, `-prod`) 預設值: development
+  - 設定建置模式 (development模式，production模式)
+* **vendor-chunk**
+  - `--vendor-chunk` (aliases: `-vc`) 預設值: true
+  - 是否將 `vendor` 單獨建置成獨立的檔案
+* **common-chunk**
+  - `--common-chunk` (aliases: `-cc`) 預設值: true
+  - 是否將重複性質的程式碼單獨建置成獨立的檔案
+* **verbose**
+  - `--verbose` (aliases: `-v`) 預設值: false
+  - 是否要顯示更多的資訊
+* **watch**
+  - `--watch` (aliases: `-w`)
+  - 當檔案異動時，重新建置專案
+* **show-circular-dependencies**
+  * *--show-circular-dependencies (aliases: -scd)*
+  * 顯示循環參考的警示
+* **build-optimizer**
+  * `--build-optimizer`
+  * (實驗性質) 啟動 `@angular-devkit/build-optimizer` 建置模式
+  * 須配合 `--aot` 使用
+* **named-chunks**
+  * `--named-chunks` (aliases: -nm)
+  * 延遲載入的檔案名稱使用名稱而非數字
+
+
+
 ## lint
+
+`ng lint` 會使用 `tsling` 的規則檢查專案程式的格式
+
+### 參數
+
+* **fix**
+
+  * `--fix` 預設值: false
+  * 修正格式錯誤
+
+* **force**
+
+  * `--force` 預設值: false
+  * 即使有格式錯誤，仍顯示成功
+
+* **type-check**
+
+  * `--type-check` 預設值: false
+  * 控制型別檢查
+
+* **format**
+
+  * `--format` (aliases: `-t`) 預設值:  prose
+
+  * 輸出格式
+
+    * prose
+
+      ![](images/2017-08-17_16-17-22.png)
+
+    * json
+
+      ![](images/2017-08-17_16-19-15.png)
+
+    * stylish
+
+      ![](images/2017-08-17_16-20-27.png)
+
+    * verbose
+
+      ![](images/2017-08-17_16-23-26.png)
+
+    * pmd
+
+      ![](images/2017-08-17_16-24-15.png)
+
+    * msbuild
+
+      ![](images/2017-08-17_16-37-11.png)
+
+    * checkstyle
+
+      ![](images/2017-08-17_16-38-02.png)
+
+    * vso
+
+      ![](images/2017-08-17_16-39-04.png)
+
+    * fileslist
+
+      ![](images/2017-08-17_16-39-39.png)
+
+
 
 ## e2e
 
+
+
 ## xi18n
+
+
 
 ## doc
 
+
+
 # 設定篇
+
+
 
 # 應用篇
 
