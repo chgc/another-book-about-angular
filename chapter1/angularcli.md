@@ -1,5 +1,5 @@
 ---
-typora-root-url: ./
+--i18n-formattypora-root-url: ./
 typora-copy-images-to: images
 ---
 
@@ -33,7 +33,7 @@ Angular CLI 是 Angular Team 與社群一起合作創造出來的工具，Angula
 
 `ng new [專案名稱]` 建立新的 Angular 專案，預設會建立一個與專案名稱相同的資料夾，並在該資料夾內初始化 Angular 專案
 
-參數
+### 參數
 
 * **directory**
 
@@ -124,8 +124,106 @@ Angular CLI 是 Angular Team 與社群一起合作創造出來的工具，Angula
   * 顯示更多輸出資訊
 
 
-
 ## serve
+
+`ng serve` 指令會進行專案建置並啟動網頁伺服器
+
+可以搭配使用的參數說明如下
+
+### 參數
+
+* **host**
+  * `--host` (aliases: `-H`) 預設值: localhost
+  * 預設指監聽 localhost
+* **hmr**
+  * `—hmr` 預設值: false
+  * 啟動模組熱拔插功能
+* **live-reload**
+  * `--live-reload` (aliases: `-lr`) 預設值: true
+  * 使用 `live-reload` 監控異動，當有異動時則會重整畫面。
+* **public-host**
+  * `--public-host` (aliases: `--live-reload-client`)
+  * 指定一個其他使用者可以瀏覽的網址。
+* **disable-host-check**
+  * `--disable-host-check`  預設值: false
+  * 不檢查連線使用者連線是否來自允許的網域。
+* **open**
+  * `--open` (aliases: `-o`) 預設值: false
+  * 在預設瀏覽器打開網址
+* **port**
+  * `--port` (aliases: `-p`) 預設值: 4200
+  * 網站伺服器所使用的連接阜
+* **ssl**
+  * `--ssl`
+  * 網站伺服器使用 `HTTPS`
+* **ssl-cert**
+  * `--ssl-cert` (aliases: `-`) 
+  * 指定 SSL 憑證位置給網站伺服器使用
+* **ssl-key**
+  * `--ssl-key`
+  * 指定 SSL 金鑰位置給網站伺服器使用
+* **aot**
+  * `--aot`
+  * 使用 `AOT` 模式建置專案
+* **base-href**
+  * `--base-href` (aliases: `-bh`)
+  * 設定 `<base>` 網址
+* **deploy_url**
+  * `--deploy-url` (aliases: `-d`)
+  * 設定部署網址
+* **environment**
+  * `--environment` (aliases: `-e`)
+  * 指定環境變數檔
+* **extract-css**
+  * `--extract-css` (aliases: `-ec`)
+  * 是否將 `global style`內設定的 css 檔案建置為 css 檔案而非 js 檔案
+* **i18n-file**
+  * `--i18n-file`
+  * 指定多國語系檔位置
+* **i18n-format**
+  * `--i18n-format`
+  * 設定多國語系檔格式
+* **locale**
+  * `--locale`
+  * 設定語系
+* **output-hashing**
+  * `--output-hashing` (aliases: `-oh`)
+  * 設定輸出檔案檔名模式(cache-busting hashing mode)，可使用的參數如下
+    * none
+    * all
+    * media
+    * bundles
+* **output-path**
+  * `--output-path` (aliases: `-op`) 
+  * 設定建置輸出位置
+* **poll**
+  * `--poll`
+  * 設定檢查檔案異動頻率 (微秒)
+* **progress**
+  * `--progress` (aliases: `-pr`) 預設值: true
+  * 顯示建置進度
+* **sourcemap**
+  * `--sourcemap` (aliases: `-sm`, `sourcemaps`)
+  * 輸出 souremap
+* **target**
+  * `--target` (aliases: `-t`, `-dev`, `-prod`) 預設值: development
+  * 設定建置模式 (development模式，production模式)
+* **vendor-chunk**
+  * `--vendor-chunk` (aliases: `-vc`) 預設值: true
+  * 是否將 `vendor` 單獨建置成獨立的檔案
+* **common-chunk**
+  * `--common-chunk` (aliases: `-cc`) 預設值: true
+  * 是否將重複性質的程式碼單獨建置成獨立的檔案
+* **verbose**
+  * `--verbose` (aliases: `-v`) 預設值: false
+  * 是否要顯示更多的資訊
+* **watch**
+  * `--watch` (aliases: `-w`)
+  * 當檔案異動時，重新建置專案
+
+### 備註
+
+當執行 `ng serve` 時，所有的過程都是在記憶體裡完成的，所以不會有實體檔案的輸出。
 
 ## generate
 
