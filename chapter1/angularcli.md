@@ -501,6 +501,44 @@ ng set apps.0.serviceWorker=true
 
 ## e2e
 
+`ng e2e` 執行並使用 `Protractor` 進行 end-to-end 測試。
+
+### 參數
+
+* **config**
+
+  * `--config` (aliases: `-c`)
+  * 指定設定檔，預設會使用在 `.angular-cli.json` 內設定的 protractor 設定檔位置
+
+* **element-explorer**
+
+  * `--element-explorer` (aliases: `-ee`) 預設值: false
+  * 啟動 Protractor's Element Explorer
+
+* **serve**
+
+  * `--serve` (aliases: `-s`) 預設值: true
+  * 啟動建置與啟動網站伺服器功能，所有 `serve` 的參數都可以使用
+
+* **specs**
+
+  * `--specs` (aliases: `-sp`) 預設值: []
+
+  * 複寫 protractor 設定檔內的 specs 檔案位置
+
+  * 指定要測試的檔案
+
+  * 如果要指定多個測試檔案，可以這樣子表示
+
+    ```
+    ng e2e --specs=spec1.ts --specs=spec2.ts
+    ```
+
+* **webdrive-update**
+
+  * `--webdrive-update` (aliases: `-wu`) 預設值: true
+  * 嘗試更新 `webdriver`
+
 
 
 ## xi18n
