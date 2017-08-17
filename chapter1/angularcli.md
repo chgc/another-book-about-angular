@@ -27,7 +27,7 @@ Angular CLI 是 Angular Team 與社群一起合作創造出來的工具，Angula
 
 # 指令篇
 
-以下命令都需要透過 `ng` 使用，範例如下
+Angular CLI 的命令都需要透過 `ng` 使用
 
 > ng <command>
 
