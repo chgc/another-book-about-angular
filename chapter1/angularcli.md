@@ -540,12 +540,170 @@ ng set apps.0.serviceWorker=true
   * 嘗試更新 `webdriver`
 
 
+## test
+
+`ng test` 會執行專案建置並啟動 `Karma` 進行測試，`Karma` 同時也會自動監控所有的檔案異動，當然也可以透過 `--watch=false` 或 `--single-run` 的參數設定，讓 Karma 只執行一次測試。
+
+參數 `--code-coverage` 可以在執行測試時同時產生測試涵蓋率，測試涵蓋率報表會輸出到 `coverage/` 資料夾內
+
+### 參數
+
+* **app**
+  - `--app` (aliases: `-a`)
+  - 使用名稱 (name) 或位置 (index) 來指定要建置的專案設定
+* **browsers**
+  * `--browsers`
+  * 修改執行測試的瀏覽器
+* **code-coverage**
+  * `--code-coverage` (aliases: `-cc`)  預設值: false
+  * 測試覆蓋率報告會輸出到 `coverage/` 資料夾
+* **color**
+  * `--colors`
+  * 輸出的結果是否要標示顏色 (報表及 logs)
+* **config**
+  * `--config` (aliases: `-c`)
+  * 指定 Karma 設定檔，預設會執行 `.angular-cli.json` 檔內的設定
+* **environment**
+  * `--environment` (aliases: `-e`)
+  * 指定環境變數檔
+* **log-level**
+  * --log-level
+  * 紀錄等級
+* **poll**
+  * `--poll`
+  * 設定檢查檔案異動頻率 (微秒)
+  * 屬 webpack watchOptions 參數 (https://webpack.js.org/configuration/watch/#watchoptions)
+* **port**
+  * `--port` (aliases: `-p`) 預設值: 4200
+  * 網站伺服器所使用的連接阜
+* **progress**
+  - `--progress` (aliases: `-pr`) 預設值: true
+  - 顯示建置進度
+* **reports**
+  * `--reporters`
+* **single-run**
+  * `--single-run` (aliases: `-sr`)
+  * 只執行一次測試
+* **sourcemap**
+  * `--sourcemap` (aliases: `-sm`, `sourcemaps`)
+  * 輸出 sourcemaps
+* **watch**
+  * `--watch` (aliases: `-w`)
+  * 當檔案異動時執行建置動作
+
+
+
+## eject
+
+`ng eject` 指令會將 Angular 專案從 CLI 模式下脫離，並產生正確的 webpack 設定檔及相關指令
+
+### 參數
+
+* **aot**
+  - `--aot` 預設值: false
+  - 建置時使用 `Ahead of Time` 編譯模式
+* **app**
+  - `--app` (aliases: `-a`)
+  - 使用名稱 (name) 或位置 (index) 來指定要建置的專案設定
+* **base-href**
+  - `--base-href` (aliases: `-bh`)
+  - 設定 `<base>` 網址
+* **deploy_url**
+  - `--deploy-url` (aliases: `-d`)
+  - 設定部署網址
+* **environment**
+  - `--environment` (aliases: `-e`)
+  - 指定環境變數檔
+* **extract-css**
+  - `--extract-css` (aliases: `-ec`)
+  - 是否將 `global style`內設定的 css 檔案建置為 css 檔案而非 js 檔案
+* **force**
+  * `--force` 預設值: false
+  * 複寫已存在的 `webpack.config.js` 和 `npm scripts`
+* **i18n-file**
+  - `--i18n-file`
+  - 指定多國語系檔位置
+* **i18n-format**
+  - `--i18n-format`
+  - 設定多國語系檔格式
+* **locale**
+  - `--locale`
+  - 設定語系
+* **output-hashing**
+  - `--output-hashing` (aliases: `-oh`)
+  - 設定輸出檔案檔名模式(cache-busting hashing mode)，可使用的參數如下
+    - none
+    - all
+    - media
+    - bundles
+* **output-path**
+  - `--output-path` (aliases: `-op`) 
+  - 設定建置輸出位置
+* **poll**
+  - `--poll`
+  - 設定檢查檔案異動頻率 (微秒)
+  - 屬 webpack watchOptions 參數 (https://webpack.js.org/configuration/watch/#watchoptions)
+* **progress**
+  - `--progress` (aliases: `-pr`) 預設值: true
+  - 顯示建置進度
+* **sourcemap**
+  - `--sourcemap` (aliases: `-sm`, `sourcemaps`)
+  - 輸出 souremap
+* **target**
+  - `--target` (aliases: `-t`, `-dev`, `-prod`) 預設值: development
+  - 設定建置模式 (development模式，production模式)
+* **vendor-chunk**
+  - `--vendor-chunk` (aliases: `-vc`) 預設值: true
+  - 是否將 `vendor` 單獨建置成獨立的檔案
+* **common-chunk**
+  - `--common-chunk` (aliases: `-cc`) 預設值: true
+  - 是否將重複性質的程式碼單獨建置成獨立的檔案
+* **verbose**
+  - `--verbose` (aliases: `-v`) 預設值: false
+  - 是否要顯示更多的資訊
+* **watch**
+  - `--watch` (aliases: `-w`)
+  - 當檔案異動時，重新建置專案
+
+
 
 ## xi18n
 
+`ng xi18n` 會從樣板中抽離 `i18n` 訊息文字
 
+### 參數
+
+* **app**
+  - `--app` (aliases: `-a`)
+  - 使用名稱 (name) 或位置 (index) 來指定要建置的專案設定
+* **i18n-format**
+  - `--i18n-format`
+  - 設定多國語系檔格式
+* **locale**
+  - `--locale`
+  - 設定語系
+* **outfile**
+  * `--out-file` (aliases: `-of`)
+  * 要輸出的檔案名稱
+* **output-path**
+  * `--output-path` (aliases: `-op`)
+  * 設定輸出路徑
+* **progress**
+  * `--progress`
+  * 在 Console 顯示執行進度
+* **verbose**
+  * `--verbose`
+  * 輸出更多詳細資訊
 
 ## doc
+
+`ng doc [search term]` 會開啟官方網站並使用關鍵字查詢 API 文件
+
+### 參數
+
+* **search**
+  * `--search` (alias: `-s` ) 預設值: false
+  * 查詢整個 `angular.io` 網站，不僅限於 API 文件的部分。
 
 
 
