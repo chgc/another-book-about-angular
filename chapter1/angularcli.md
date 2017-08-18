@@ -1,8 +1,3 @@
----
---i18n-formattypora-root-url: ./
-typora-copy-images-to: images
----
-
 # Angular CLI
 
 Angular CLI 是 Angular Team 與社群一起合作創造出來的工具，Angular CLI (以下簡稱為 CLI) 提供一系列的指令，讓開發者可以從建置專案、開發、測試、一直到部屬，都可以透過 CLI 的幫助下完成。
@@ -140,7 +135,7 @@ Angular CLI 的命令都需要透過 `ng` 使用
 
 * **host**
   * `--host` (aliases: `-H`) 預設值: localhost
-  * 預設指監聽 localhost
+  * 預設網址 localhost
 * **hmr**
   * `—hmr` 預設值: false
   * 啟動模組熱拔插功能
@@ -707,7 +702,102 @@ ng set apps.0.serviceWorker=true
 
 
 
+
 # 設定篇
+
+Angular CLI 有提供設定檔 `.angular-cli.json` ，這個設定檔內有分以下區塊
+
+## 參數
+
+- **project**:  專案全域設定
+  - *name* (`string`):  專案名稱
+  - *ejected*(`boolean`): 專案是否已經脫離 CLI . 預設值： `false`.
+- **apps** (`array`): 用於設定專案下不同的應用程式
+  - *name* (`string`): 名稱
+  - *root* (`string`): 根目錄
+  - *outDir* (`string`): 建置輸出資料夾. 預設值：`dist/`
+  - *assets* (`array`): 資源檔清單
+  - *deployUrl* (`string`): 檔案部屬網址
+  - *index* (`string`): 起始頁面的檔案名稱，預設值：`index.html`
+  - *main* (`string`): 啟動應用程式的的入口檔案名稱，預設值：`main.ts`
+  - *polyfills* (`string`): `polyfills` 的檔案，載入時間點會比應用程式早。
+  - *test* (`string`): 執行測試時的入口檔案名稱
+  - *tsconfig* (`string`): TypeScript 設定檔，預設值：`tsconfig.app.json`.
+  - *testTsconfig* (`string`): 給單元測試時使用的 TypeScript 設定檔
+  - *prefix* (`string`): 建立 `selector` 時所使用的前綴字
+  - *serviceWorker* (`boolean`): 使用 `@angular/service-worker` 套件來實踐 `Service Worker` 功能 (實驗性質)， 預設值： `false`.
+  - *showCircularDependencies* (`boolean`): 在建置時顯示循環依賴的警示，預設值：`true`
+  - *styles* (`string|array`):  建置時需要被引用的全域的樣式檔
+  - stylePreprocessorOptions: 要傳給樣式處理的參數設定
+    - *includePaths* (`array`): 含括資料夾，資料夾路徑是相對於專案根目錄
+  - *scripts* (`array`): 建置時需要被引用的全域的 `Script` 檔
+  - *environmentSource* (`string`): 環境變數來源檔案
+  - *environments* (`object`): 階段名稱與相對應的環境變數檔
+- **e2e**: 用於設定 E2E 測試
+  - protractor
+    - *config* (`string`): 設定檔路徑
+- **lint** (`array`): 要傳給 TSLint 的屬性
+  - *files* (`string|array`): 設定要檢查格式的檔案或檔案清單
+  - *project* (`string`): 設定 `tsconfig.json` 的位置，當沒有設定 `files` 時，則會使用 `tsconfig.json` 內的檔案設定
+  - *tslintConfig* (`string`): 設定 `tslint.json` 的檔案位置，預設值： `tslint.json`.
+  - *exclude* (`string|array`): 排除不檢查格式的檔案或檔案清單
+- **test**: 單元測試環境設定
+  - karma
+    - *config* (`string`): 設定 karma 設定檔位置
+  - codeCoverage
+    - *exclude* (`array`): 設定需要從測試涵蓋率報告中排除的檔案項目
+- **defaults**: 設定 `generateing` 的預設行為
+  - *styleExt* (`string`): 樣式檔案副檔名
+  - *poll* (`number`): 檢查檔案異動的頻率
+  - class: 產生 class 選項
+    - *spec* (`boolean`):  設定是否要產生測試檔案. 預設值 `false`.
+  - component:  產生 component 選項
+    - *flat* (`boolean`): 設定是否不要建立資料夾，預設值：`false`
+    - *spec* (`boolean`): 設定是否要產生測試檔案，預設值 `true`
+    - *inlineStyle* (`boolean`): 設定樣式是否要寫在 ts 檔案裡，預設值：`false`
+    - *inlineTemplate* (`boolean`): 設定樣版是否要寫在 ts 檔案哩，預設值：`false`
+    - *viewEncapsulation* (`string`): 設定顯示封裝策略，可以為以下幾種， `Emulated`、 `Native` 或 `None`
+    - *changeDetection* (`string`): 設定異動偵測策略，可以為以下幾種， `Default` 或 `OnPush`
+  - directive: 產生 directive 選項 
+    - *flat* (`boolean`): 設定是否不要建立資料夾，預設值：`true`
+    - *spec* (`boolean`): 設定是否要產生測試檔案，預設值 `true`
+  - guard: 產生 guard 選項 
+    - *flat* (`boolean`): 設定是否不要建立資料夾，預設值：`true`
+    - *spec* (`boolean`): 設定是否要產生測試檔案，預設值 `true`
+  - interface: 產生 interface 選項
+    - *prefix* (`string`): 設定產生 interface 時，interface 名稱的前綴字 (i.e. I)
+  - module: 產生 module 選項
+    - *flat* (`boolean`): 設定是否不要建立資料夾，預設值：`false`
+    - *spec* (`boolean`): 設定是否要產生測試檔案，預設值 `false`
+  - pipe:  產生 pipe 選項
+    - *flat* (`boolean`): 設定是否不要建立資料夾，預設值：`true`
+    - *spec* (`boolean`):  設定是否要產生測試檔案，預設值 `true`
+  - service: 產生 service 選項
+    - *flat* (`boolean`): 設定是否不要建立資料夾，預設值：`true`
+    - *spec* (`boolean`):  設定是否要產生測試檔案，預設值 `true`
+  - build: 建置專案時預設的參數設定
+    - *sourcemaps* (`boolean`): 輸出 sourcemaps
+    - *baseHref* (`string`): 設定應用程式的 Base url
+    - *progress* (`boolean`): 輸出建置過程的進度紀錄，預設值：`true`
+    - *poll* (`number`):  啟動並設定檢查檔案異動頻率 (微秒)
+    - *deleteOutputPath* (`boolean`): 在建置前是否要刪除輸出資料夾，預設值：`true`
+    - *preserveSymlinks* (`boolean`): 當解析 modules 時，不要使用實際檔案位置，預設值：`false`
+    - *showCircularDependencies* (`boolean`): 顯示循環依賴警示，預設值：`true`
+    - *namedChunks* (`boolean`): 使用檔案名稱命名延遲載入用的 chunk 檔案名稱
+  - serve: 啟動服務專案時預設的參數設定
+    - *port* (`number`): 網頁伺服器連接阜，預設值： `4200`.
+    - *host* (`string`): 網頁伺服器網址，預設值： `localhost`.
+    - *ssl* (`boolean`): 網頁伺服器起動 `ssl`，預設值：`false`
+    - sslKey* (`string`): 指定 SSL 金鑰位置給網站伺服器使用. 預設值： `ssl/server.key`.
+    - *sslCert* (`string`): 指定 SSL 憑證位置給網站伺服器使用. 預設值： `ssl/server.crt`.
+    - *proxyConfig* (`string`): 設定 `Proxy` 設定檔案位置
+- **packageManager** (`string`): 設定套件管理工具，可以以下工具 `npm`, `cnpm` and `yarn`.
+- **warnings**: 允許關掉警示訊息
+  - *nodeDeprecation* (`boolean`): 當 node 版本不符合時顯示提示，預設值：`true`
+  - *packageDeprecation* (`boolean`): 當有安裝 `angular-cli` 要顯示提示訊息，預設值：`true`
+  - *versionMismatch* (`boolean`):  如果全域版本比本地版本還新時，顯示提示訊息，預設值：`true`
+
+
 
 
 
