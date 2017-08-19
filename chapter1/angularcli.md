@@ -1,7 +1,3 @@
----
-typora-root-url: ../chapter1
----
-
 # Angular CLI
 
 Angular CLI 是 Angular Team 與社群一起合作創造出來的工具，Angular CLI (以下簡稱為 CLI) 提供一系列的指令，讓開發者可以從建置專案、開發、測試、一直到部屬，都可以透過 CLI 的幫助下完成。
@@ -14,11 +10,11 @@ Angular CLI 是 Angular Team 與社群一起合作創造出來的工具，Angula
 
 > npm install -g @angular/cli
 
-![](/images/npminstall.jpg)
+![](images/npminstall.jpg)
 
 當安裝完成後，可以透過 `ng -v` 的指令來檢查安裝的版本
 
-![](/images/2017-08-16_19-56-50.jpg)
+![](images/2017-08-16_19-56-50.jpg)
 
 當看到這個畫面時，就表示 Angular CLI 安裝成功了
 
@@ -66,11 +62,11 @@ Angular CLI 的命令都需要透過 `ng` 使用
 
   * 最小單位的 Angular 專案結構
 
-    ![2017-08-16_21-41-33](/images/2017-08-16_21-41-33.jpg)
+    ![2017-08-16_21-41-33](images/2017-08-16_21-41-33.jpg)
 
   * 完整的 Angular 專案架構
 
-    ![2017-08-16_21-43-07](/images/2017-08-16_21-43-07.jpg)
+    ![2017-08-16_21-43-07](images/2017-08-16_21-43-07.jpg)
 
 * **prefix**
 
