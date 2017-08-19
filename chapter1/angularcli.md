@@ -806,7 +806,7 @@ Angular CLI 有提供設定檔 `.angular-cli.json` ，這個設定檔內有分�
 
 # 應用篇
 
-### proxy
+## proxy
 
 proxy 的應用在開發 Angular 時，是一個非常實用的技巧，可以讓 webpack's dev server 攔截特定的網址並轉送到指定的網址去。例如說，我們的 API 伺服器位在 `https://localhost:3000` 地方，任何呼叫 `/api` 的網址都希望能直接使用 `https://localhost:3000` 的伺服器，這時候，我們就可以透過 proxy 的設定來完成這件事情
 
@@ -840,7 +840,7 @@ proxy 的應用在開發 Angular 時，是一個非常實用的技巧，可以�
       ```
 
 
-#### 多入口情境
+### 多入口情境
 
 如果有多個網址都需要轉送至相同的伺服器位置時，在建立一個 `proxy.conf.js` ， 並設定如下
 
@@ -870,7 +870,7 @@ module.exports = PROXY_CONFIG;
 "start": "ng serve --proxy-config proxy.conf.js"
 ```
 
-#### 跳過 proxy 設定
+### 跳過 proxy 設定
 
 proxy 設定檔可以設定例外狀況，當有時有特定的情況是不希望轉送時，就可以設定排除
 
@@ -920,7 +920,7 @@ module.exports = PROXY_CONFIG;
 2. **input**：資料夾路徑，`..` 可以瀏覽至根目錄的上一層
 3. **output**： 輸出目標位置
 
-#### 應用技巧
+### 應用技巧
 
 可以利用上述的技巧，將 `node_modules`下的某些檔案在建置專案時，同時輸出目標資料夾
 
@@ -930,7 +930,7 @@ module.exports = PROXY_CONFIG;
 ]
 ```
 
-### 全域套件安裝
+## 全域套件安裝
 
 在開發專案時，大部分的情況，我們會安裝第三方套件，例如：bootstrap，Angular CLI 也提供方法讓我們透過 `.angular-cli.json` 的方式將第三方套件安裝進 Angular 專案中，以下用 `bootstrap 4` 作為範例 
 
@@ -959,5 +959,8 @@ module.exports = PROXY_CONFIG;
    ],
    ```
 
-4. 這樣子設定完後，在
+4. 這樣子設定完後，在 `build` 與 `serve`時，就會有 `bootstrap`的功能了
+
+
+
 
