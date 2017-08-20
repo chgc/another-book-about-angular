@@ -1,4 +1,10 @@
-# NPM package.json
+# NPM
+
+`npm` 是一套 node.js 的套件管理工具，也是一個公開的線上套件資料庫，目前廣泛地使用於 node.js、網站前端開發、手機應用程式、機器人等 JavaScript 社群
+
+不論是開發套件，或是使用套件，都需要一個 `package.json` 套件定義檔來管理。
+
+# package.json
 
 `package.json` 是 npm 用來管理套件，任務，發佈等相關資訊，因為 Angular CLI 也是使用 NPM 來管理套件，所以還是花點時間了解 `package.json` ，以下是 Angular CLI 所產生出來的 `package.json` 檔案。
 
@@ -21,7 +27,7 @@
 }
 ```
 
-# 設定檔結構
+## 設定檔結構
 
 * **name** (必填)：套件名稱
   * 規則
@@ -149,13 +155,27 @@
 
 # 應用技巧
 
-## 更新套件
+## 升級 npm 
+
+### mac
+
+```
+npm install -g npm
+```
+
+### Windows
+
+
+
+
+
 
 
 
 
 # 參考資料
 
+* [npm](https://www.npmjs.com/)
 * [package.json](https://docs.npmjs.com/files/package.json)
 * [scripts](https://docs.npmjs.com/misc/scripts)
 * [semver](https://docs.npmjs.com/misc/semver)
