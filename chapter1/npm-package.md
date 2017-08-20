@@ -59,15 +59,15 @@
 
     * `version`：指定特定版本
 
-    * `>version`：版本必須大於 `version`
+    * `>version`：版本必須大於特定版本
 
-    * `>=version`：版本必須大於或等於 `version`
+    * `>=version`：版本必須大於或等於特定版本
 
-    * `<version`：版本必須小於 `version`
+    * `<version`：版本必須小於特定版本
 
-    * `<=version`：版本必須小於或等於 `version`
+    * `<=version`：版本必須小於或等於特定版本
 
-    * `~version`：大致相同於此版本
+    * `~version`：大致等於特定版本
 
     * `^version` ：相容於此版本
 
@@ -75,15 +75,15 @@
 
     * `http://...`：指定套件的網址，會從該網址下載套件並安裝
 
-    * `*` 任何版本
+    * `*` 最新版本
 
     * `""` ：空白，效果等同於 `*`
 
-    * `version1 - version2` 等同於 `>=version1 <=version2`.
+    * `version1 - version2` ：介於 `version1` 與 `version2`之間
 
-    * `range1 || range2` 如果 range1 或 range2 都不符合時，則忽略此套件
+    * `range1 || range2`：二選一版本
 
-    * `git…` : 格式與範例如下
+    * `git…` : 指定 Git URL 格式與範例如下
 
       ```
       <protocol>://[<user>[:<password>]@]<hostname>[:<port>][:][/]<path>[#<commit-ish> | #semver:<semver>]
@@ -96,7 +96,7 @@
       git://github.com/npm/npm.git#v1.0.27
       ```
 
-    * `user/repo`：使用 GitHub Repo
+    * `user/repo`：指定 GitHub Repo
 
       ```
       "express": "expressjs/express",
