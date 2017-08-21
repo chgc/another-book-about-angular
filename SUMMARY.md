@@ -5,7 +5,7 @@
   * [NPM Packages](chapter1/npm-package.md)
   * [TypeScript 設定](chapter1/tsconfig.md)
   * [Angular CLI](chapter1/angularcli.md)
-* [TypeScript]()
+* [TypeScript](chapter2/typescript.md)
 * [RxJS]()
 * [架構]()
   * [ngModules]()
