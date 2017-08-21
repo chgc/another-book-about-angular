@@ -90,7 +90,7 @@ x = ["hello", 10]; // OK
 x = [10, "hello"]; // Error
 ```
 
-TypeScript 很聰明的可以判斷目前所選取的資料的型別，如果使用到不屬於該型別可以使用的方法時，在開發時就會顯示錯誤提示
+TypeScript 很聰明的可以判斷目前所選取的資料的型別，如果使用到不屬於該型別可以使用的函數時，在開發時就會顯示錯誤提示
 
 ```typescript
 console.log(x[0].substr(1)); // OK
@@ -174,7 +174,7 @@ list[1] = 100;
 
 ### Void
 
-`void` 這型別是告訴 TypeScript 說，目前的這個方法不會回傳任何資料，或是變數只能接受 `null` 或 `undefined`
+`void` 這型別是告訴 TypeScript 說，目前的這個函數不會回傳任何資料，或是變數只能接受 `null` 或 `undefined`
 
 ```typescript
 function warnUser(): void {
@@ -210,7 +210,7 @@ name = null ; // ok
 
 ### Never
 
-`never` 是一個很特殊的型別，也是在 TypeScript 2.0 所新增的型別之一。`never` 代表**不會有任何值發生**。使用情境可以是用來判斷一個方法是否有涵蓋所有的可能性
+`never` 是一個很特殊的型別，也是在 TypeScript 2.0 所新增的型別之一。`never` 代表**不會有任何值發生**。使用情境可以是用來判斷一個函數是否有涵蓋所有的可能性
 
 ```typescript
 // Inferred return type is number
@@ -252,11 +252,131 @@ let strLength: number = (someValue as string).length;
 
 ## Variable Declarations
 
-ES6 (ES2015) 推出了兩種新方法 `let` 和 `const`  可以定義變數，同時也建議不要再使用 `var` 來定義變數。
+ES6 (ES2015) 推出了兩種定義變數的新方式 `let` 和 `const` ，同時也建議不要再使用 `var` 來定義變數。
 
 在介紹 `let` 與 `const` 之前，先解釋一下為什麼不建議再使用 `var` 的原因
 
 ### No more Var
+
+在 ES5 以前的年代裡，都使用 `var` 來定義變數
+
+```javascript
+var a = 10;
+```
+
+當然也可以在 function 內使用 `var` 定義變數
+
+```javascript
+function f() {
+    var message = "Hello, world!";
+
+    return message;
+}
+```
+
+或是這樣子定義變數，在 function 內所定義的其他 function 也可取得該變數的值
+
+```javascript
+function f() {
+    var a = 10;
+    return function g() {
+        var b = a + 1;
+        return b;
+    }
+}
+var g = f();
+g(); // 回傳 11
+```
+
+但是，這樣子的定義方式，當 function 結構越複雜時，就越難追蹤該變數值的變化，例如以下範例，當寫程式或是接手程式的人，對於 JavaScript 的特性不熟悉時，就會有迷惑的情形發生
+
+```javascript
+function f() {
+    var a = 1;
+
+    a = 2;
+    var b = g();
+    a = 3;
+
+    return b;
+
+    function g() {
+        return a;
+    }
+}
+
+f(); // returns '2'
+```
+
+而 `var` 還有另外一個奇怪的特性，就是 `scoping rule`，其實嚴格的說，應該是 JavaScript Hoisting 的特性造成的，根據 MDN 的解釋
+
+> 提升 ( Hoisting ) 是您在 JavaScript 文檔中找不到的項目。提升是在 JavaScript 中需要思考程式片段的前後關係（特別是於創建和執行階段）通常是如何進行的地方，而且，提升可能會引起誤解。例如，提升使變數和函數的宣告被移動到您編寫的程式區塊頂端，但這並非發生於您編寫程式時，此發生於編譯階段，變數和函數的宣告提升會於放入記憶體中時處理，但在您編寫的程式碼中，仍然保留於您所鍵入的位置。
+
+簡單的說，變數或是函數的宣告，都會自動被提升到函數或是程式碼的最上面，這個規則有好有壞，先說好的部分
+
+```javascript
+catName("Chloe");
+
+function catName(name) {
+  console.log("My cat's name is " + name);
+}
+```
+
+上列的程式碼，即使函數是在呼叫函數之後才定義的，基於`提升`原則，這段程式碼還是可以正常運作的
+
+但是，以下的程式碼範例就是顯示 `提升` 原則造成的思考邏輯上的混淆
+
+```javascript
+function f(shouldInitialize: boolean) {
+    if (shouldInitialize) {
+        var x = 10;
+    }
+    return x;
+}
+
+f(true);  // returns '10'
+f(false); // returns 'undefined'
+```
+
+上列的程式碼在 JavaScript 的編譯器裡面，會被轉換成這樣，也就能解釋為什麼第二次呼叫時，會回傳 `undefined` 了
+
+```javascript
+function f(shouldInitialize: boolean) {
+    var x;
+    if (shouldInitialize) {
+        x = 10;
+    }
+    return x;
+}
+```
+
+簡單的說，用 `var` 定義的變數，沒有真正的 `scope` 觀念，`var` 所認知的 `scoping` 定義是根據函數為 `scoping` 的界線，有人稱之為 `function-scoping`，這就延伸出另外一個很常見的錯誤，**var in for loop**
+
+```javascript
+function sumMatrix(matrix: number[][]) {
+    var sum = 0;
+    for (var i = 0; i < matrix.length; i++) {
+        var currentRow = matrix[i];
+        for (var i = 0; i < currentRow.length; i++) {
+            sum += currentRow[i];
+        }
+    }
+
+    return sum;
+}
+
+// or
+
+for (var i = 0; i < 10; i++) {
+    setTimeout(function() { console.log(i); }, 100 * i);
+}
+```
+
+這兩段程式碼跑出來的結果，是我們真正所預期看到的結果嗎? 可以自己跑看看就知道了。
+
+這也是為什麼在 ES6 以後的變數定義，不建議使用 `var` 而一律使用 `let`  或是 `const`來定義變數了。
+
+
 
 ### let
 
