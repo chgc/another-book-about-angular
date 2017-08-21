@@ -2,7 +2,6 @@
 
 * [引言](README.md)
 * [設定](chapter1/README.Mmd)
-  * [Visual Studio Code](chapter1/vscode.md)
   * [NPM Packages](chapter1/npm-package.md)
   * [TypeScript 設定](chapter1/tsconfig.md)
   * [Angular CLI](chapter1/angularcli.md)
