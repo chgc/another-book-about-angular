@@ -10,7 +10,7 @@ TypeScript 是什麼?
 
 
 
-這一個章節，我們會詳細的介紹 TypeScript 這語言的功能
+這一個章節，我們會詳細的介紹 TypeScript 的功能
 
 
 
@@ -210,15 +210,55 @@ name = null ; // ok
 
 ### Never
 
-`never` 是一個很特殊的型別，也是在 TypeScript 2.0 所新增的型別之一。
+`never` 是一個很特殊的型別，也是在 TypeScript 2.0 所新增的型別之一。`never` 代表**不會有任何值發生**。使用情境可以是用來判斷一個方法是否有涵蓋所有的可能性
+
+```typescript
+// Inferred return type is number
+function move1(direction: "up" | "down") {
+    switch (direction) {
+        case "up":
+            return 1;
+        case "down":
+            return -1;
+    }
+    return error("Should never get here");
+}
+
+function error(message: string): never {
+    throw new Error(message);
+}
+
+// or Function returning never must have unreachable end point
+function infiniteLoop(): never {
+    while (true) {
+    }
+}
+```
 
 ### Type assertions
 
-### 備註
+TypeScript 提供了型別轉型的方法，使用方式有 `<T>` 或是 `as T`，`T` 為要轉換的型別，主要目的是告訴 TypeScript 說，「我很確定這個物件或是變數的型別是我說的這個，所以請使用我指定的型別做後續的判斷」
+
+```typescript
+let someValue: any = "this is a string";
+let strLength: number = (<string>someValue).length;
+
+// or use as-
+let someValue: any = "this is a string";
+let strLength: number = (someValue as string).length;
+```
 
 
 
 ## Variable Declarations
+
+變數宣告
+
+
+
+
+
+
 
 ## Interface
 
