@@ -252,7 +252,17 @@ let strLength: number = (someValue as string).length;
 
 ## Variable Declarations
 
-變數宣告
+ES6 (ES2015) 推出了兩種新方法 `let` 和 `const`  可以定義變數，同時也建議不要再使用 `var` 來定義變數。
+
+在介紹 `let` 與 `const` 之前，先解釋一下為什麼不建議再使用 `var` 的原因
+
+### No more Var
+
+### let
+
+### const
+
+
 
 
 
