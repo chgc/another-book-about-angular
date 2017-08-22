@@ -380,11 +380,202 @@ for (var i = 0; i < 10; i++) {
 
 ### let
 
+`let` 的使用方式與 `var` 的用法是一樣的
+
+```typescript
+let hello = "Hello!";
+```
+
+有以下幾點的差異性
+
+1.  **Scoping**，`let` 屬於 `block-scoping`，意思是，在區塊內定義的的變數，不會去影響到區塊以外的變數，但可以內層可以使用外層所定義的變數。
+
+```typescript
+function f(input: boolean) {
+    let a = 100;
+
+    if (input) {
+        // 能可以正常的存取 'a' 
+        let b = a + 1;
+        return b;
+    }
+
+    // 錯誤: 'b' 不存在 
+    return b;
+}
+```
+
+2. **提升**， `let` 不會被提升到最上面，這表示要使用任何變數都必須先定義才可以使用
+
+```typescript
+a++; // a 尚未定義，為不合法使用
+let a;
+```
+
+3. **重複定義**，`var`  允許相同的變數重複定義，但是 `let` 就不允許這情形發生了
+
+   ```typescript
+   let x = 10;
+   let x = 20; // 錯誤: 在相同的 scope 下不能重複定義 'x'
+
+   function f(x) {
+       let x = 100; // 錯誤: 引數已經定義過 'x'
+   }
+
+   function g() {
+       let x = 100;
+       var x = 100; // 錯誤: 不能有兩種宣告 'x' 的方式
+   }
+   ```
+
+我們現在回頭看剛剛使用 `var` 所寫的函數，當改用 `let` 時，會不會正常的運作
+
+```typescript
+function sumMatrix(matrix: number[][]) {
+    let sum = 0;
+    for (let i = 0; i < matrix.length; i++) {
+        var currentRow = matrix[i];
+        for (let i = 0; i < currentRow.length; i++) {
+            sum += currentRow[i];
+        }
+    }
+
+    return sum;
+}
+
+// or
+
+for (let i = 0; i < 10; i++) {
+    setTimeout(function() { console.log(i); }, 100 * i);
+}
+```
+
 ### const
 
+`const` 就如字面意思，是用來定義常數的，當常數定義後，就不能再設定新的值，所以在宣告常數變數時，必須同時間賦予值
 
+```typescript
+const numLivesForCat = 9;
+const kitty = {
+    name: "Aurora",
+    numLives: numLivesForCat,
+}
 
+// 這樣子改變物件內容是 okey 的
+kitty.name = "Rory";
+kitty.numLives--;
+```
 
+不能這樣子使用 `const`，錯誤示範
+
+```typescript
+// 錯誤範例1
+const kitty = {
+    name: "Aurora",
+    numLives: numLivesForCat,
+}
+// 不能重新給予新值
+kitty = {
+    name: "Danielle",
+    numLives: numLivesForCat
+};
+
+// 錯誤範例2
+const kitty;
+kitty = {
+    name: "Danielle",
+    numLives: numLivesForCat
+};
+```
+
+###  Destructuring
+
+`Destructuring` 是 ES2015 介紹的另外一個新功能，也可以稱為`解構賦值 (Destructuring Assignment)`，有兩種解構
+
+1. 陣列
+
+   ```typescript
+   let input = [1, 2];
+   let [first, second] = input;
+   console.log(first); // outputs 1
+   console.log(second); // outputs 2
+   ```
+
+   當然原本的 `input[0]` 的寫法依然可以好好的工作，只是解構賦值寫法不會覺得很簡潔帥氣嗎?
+
+   另外一種應用方式，就是當作函數的引數使用
+
+   ```typescript
+   function f([first, second]: [number, number]) {
+       console.log(first);
+       console.log(second);
+   }
+   f([1, 2]);
+   ```
+
+2. 物件
+
+   物件也可以跟陣列一樣，使用解構賦值的方式
+
+   ```typescript
+   let o = {
+       a: "foo",
+       b: 12,
+       c: "bar"
+   };
+   let { a, b } = o;
+
+   ({ a, b } = { a: "baz", b: 101 });
+   ```
+
+   這裡有一個地方需要注意的是，因為 `{}` 預設會被視為 `block` ，所以需要搭配 `()` 才可以正常使用物件解構賦值
+
+   物件的解構還有其他的技巧，例如，可以在解構賦值的過程中，重新命名新的變數名稱
+
+   ```typescript
+   let { a: newName1, b: newName2 } = o;
+
+   // 等同於
+   let newName1 = o.a;
+   let newName2 = o.b;
+   ```
+
+   當函數引數為物件時，有時我們會將其中一個屬性設為非必要，而這時候我們可以使用解構賦值的方式，賦予預設值
+
+   ```typescript
+   function keepWholeObject(wholeObject: { a: string, b?: number }) {
+       let { a, b = 1001 } = wholeObject;
+   }
+   ```
+
+### Spread
+
+`Spread` 的語法是 `…`，就是三個點。這個 Spread 的運算式，適用於陣列與物件，(須留意 Object Spread 是在 TypeScript 2.1 版以後才支援)，Spread 運算式的功能是將一個陣列轉換成另外一個新陣列，可以說是 Destructuring 功能相反
+
+```typescript
+let first = [1, 2];
+let second = [3, 4];
+let bothPlus = [0, ...first, ...second, 5];
+
+// object 
+let merged = { ...foo, ...bar, ...baz };
+let obj = { x: 1, y: "string" };
+var newObj = {...obj, z: 3, y: 4}; // { x: number, y: number, z: number }
+```
+
+但還是有些限制，例如遇到某物件內有屬性及函數，透過 `spread` 運算式，只能取出該物件內的屬性。
+
+```typescript
+class C {
+  p = 12;
+  m() {
+  }
+}
+let c = new C();
+let clone = { ...c };
+clone.p; // ok
+clone.m(); // error!
+```
 
 
 
