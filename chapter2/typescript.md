@@ -607,7 +607,7 @@ let myObj = { age: 10, label: 'Size 10 Object'};
 printLabel(myObj);
 ```
 
-## Optional Properties
+### Optional Properties
 
 定義 interface 時，有時會遇到某些欄位可有可無的狀況，要在 interface 表示這種狀況，可以使用 `?` 來描述屬性，這樣型別檢查時，就不會強求該屬性存在與否。
 
@@ -631,7 +631,7 @@ function createSquare(config: SquareConfig): {color: string; area: number} {
 let mySquare = createSquare({color: "black"});
 ```
 
-TypeScript 2.4版介紹了一個新功能，`weak type detection` ，當一個 interface 內的屬性都是可選參數時，Type-Checker 會強制檢查所傳入的值，至少要有一項是符合 interface 的屬性。拿上述的範例來說，如果 `createSquare` 傳入的物件屬性沒有符合 interface 內的屬性， TypeScript 會顯示錯誤訊息
+TypeScript 2.4版介紹了一個新功能，`weak type detection` ，Type-Checker 會強制檢查所傳入的值，如果傳入的引數不符合 interface 的定義，不論是缺少或多於的屬性，TypeScript 都會顯示錯誤訊息。拿上述的範例來說，如果 `createSquare` 傳入的物件屬性沒有符合 interface 定義， TypeScript 會抱怨給你知道
 
 ```typescript
 interface SquareConfig {
@@ -648,11 +648,200 @@ let mySquare = createSquare({height: 10}); // 錯誤訊息如下
 
 ![](images/2017-08-23_21-42-37.jpg)
 
+因為這是 2.4 版本的新功能，或許會造成現有程式碼的發生錯誤，所以有一些建議的方法可以繞過或避免錯誤
 
+1. 如果屬性真的存在，請宣告該屬性
+2. 新增 `index signature`  到 weak type 裡，例如：[propName: string]: {}
+3. 使用`Type Assertion`，例如：opts as Options
 
+### Readonly properties
 
+在函數內可以定義常數，在 interface 裡，`readonly` 的功能就與 `const`的功能是一樣的，當實作該 interface 時，只允許初始化時賦予屬性資料，之後就不能做任何修改。而 `readonly` 與 `const` 的差別是，屬性使用`readonly`，變數使用`const` 。
 
+```typescript
+interface Point {
+    readonly x: number;
+    readonly y: number;
+}
 
+let p1: Point = { x: 10, y: 20 };
+p1.x = 5; // 錯誤!
+```
+
+TypeScript 也提供唯獨陣列 ，`ReadonlyArray<T>` ，這也是陣列，只是當建立後就不能做任何的修改了
+
+```typescript
+let a: number[] = [1, 2, 3, 4];
+let ro: ReadonlyArray<number> = a;
+ro[0] = 12; // 錯誤!
+ro.push(5); // 錯誤!
+ro.length = 100; // 錯誤!
+a = ro; // 錯誤!
+```
+
+但可以透過 type assertion 的方式將 `ReadonlyArray<T>` 轉換回一般可異動的陣列
+
+```typescript
+a = ro as number[];
+```
+
+### Function Type
+
+interface 不只有定義屬性，也可以用來定義函數，interface 針對函數的定義有分兩種，一種是單純函數定義，如下列範例
+
+```typescript
+interface SearchFunc {
+    (source: string, subString: string): boolean;
+}
+
+let mySearch: SearchFunc;
+mySearch = function(source: string, subString: string) {
+    let result = source.search(subString);
+    return result > -1;
+}
+```
+
+實作引數名稱不需與 interface 內所定義的名稱相同，TypeScript 的型別檢查只在意引數及回傳值的型別是否正確。
+
+### Indexable Types
+
+如同字面上的意思，這是定義索引陣列取值方式，換句話說，就是定義一個 KeyValue 的資料集
+
+```typescript
+interface StringArray {
+    [index: number]: string;
+}
+
+let myArray: StringArray;
+myArray = ["Bob", "Fred"];
+
+let myStr: string = myArray[0];
+```
+
+還記得在 `Optional Properties` 節有提到修正 `weak type detection` 錯誤的修正方法之一，就是使用 `[propName: string]: string`，這種表示法就是 `Indexable Types` 。要從一個物件取出資料時，就必須吻合所設定的索引方式
+
+```typescript
+interface myClassList {
+    [class: string]: boolean;
+}
+
+let ngClassList: myClassList;
+ngClassList = {'blue': true, 'bold': true};
+```
+
+### Class Types
+
+interface 也可以用來規範 Class ，這部分如果有寫過強型別後端的人就知道，如果要實作 IoC ，就必須透過 interface 來定義 Class 的內容，而 TypeScript 裡的 Class Types Interface 也是一樣的功能
+
+```typescript
+interface ClockInterface {
+    currentTime: Date;
+    setTime(d: Date);
+    new (hour: number, minute: number);
+}
+
+class Clock implements ClockInterface {
+    currentTime: Date;
+    setTime(d: Date) {
+        this.currentTime = d;
+    }
+    constructor(h: number, m: number) { }
+}
+```
+
+### Extending Interfaces
+
+就跟 Class  一樣，Interface 也可以被擴充，擴充可以讓 Interface 更加有彈性，提供重複利用率
+
+```typescript
+interface Shape {
+    color: string;
+}
+
+interface Square extends Shape {
+    sideLength: number;
+}
+
+let square = <Square>{};
+square.color = "blue";
+square.sideLength = 10;
+```
+
+Interface 可以繼承多個 interface，有點積木的感覺
+
+```typescript
+interface Shape {
+    color: string;
+}
+
+interface PenStroke {
+    penWidth: number;
+}
+
+interface Square extends Shape, PenStroke {
+    sideLength: number;
+}
+
+let square = <Square>{};
+square.color = "blue";
+square.sideLength = 10;
+square.penWidth = 5.0;
+```
+
+### Hybrid Types 
+
+所謂的 HyBrid Types 是將 Function Types 與 Class Types 的定義模式混合在一起，這個都要感謝 JavaScript 的語言特性，讓這一切都變得有趣。就先看一下定義方式與實作方式吧，通常會在與第三方套件溝通時，才會有機會使用到這種設計模式。
+
+```typescript
+interface Counter {
+    (start: number): string;
+    interval: number;
+    reset(): void;
+}
+
+function getCounter(): Counter {
+    let counter = <Counter>function (start: number) { };
+    counter.interval = 123;
+    counter.reset = function () { };
+    return counter;
+}
+
+let c = getCounter();
+c(10);
+c.reset();
+c.interval = 5.0;
+```
+
+### Interfaces Extending Classes
+
+好吧，我承認這種組合很奇怪，通常都是 Class 繼承 interfaces，但為什麼會有這樣子的情形發生呢？先看一下範例程式碼
+
+```typescript
+class Fenton {
+    public height = 'Tall';
+    getHeight() {
+        return this.height;
+    }
+}
+
+interface IFenton extends Fenton {
+    getWeight() : string;
+}
+
+class FentonLike implements IFenton {
+    public height = 'Medium';
+    getHeight() {
+        return this.height;
+    }
+    getWeight() {
+        return 'Don\'t ask';
+    }
+}
+```
+
+TypeScript 遇到 interface 繼承 classes 的狀態時，會自動將 classes 轉換成 interface 模式，所以當實作 interface 時，就必須完整實作 interface 及其繼承的 class。
+
+所以 interface 繼承 classes 是一種將 class 轉換成 interface 後的一種擴充手法。
 
 
 
