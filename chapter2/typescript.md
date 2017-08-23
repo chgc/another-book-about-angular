@@ -577,11 +577,84 @@ clone.p; // ok
 clone.m(); // error!
 ```
 
-
-
-
-
 ## Interface
+
+型別檢查是 TypeScript 核心精神之一，尤其是著重於資料結構描述，稱為 `duck typing` 或是 `structural subtyping`。Interface 是 TypeScript 提供一種用來描述資料結構的強大方法，Interface 只會存在於開發階段，並不會隨著編譯一起輸出至 JavaScript。
+
+還記得在一開始介紹基本型別的地方，我們可以在函數定義所接受的引數型別為何，如果引數的型別是一個物件型態，這時會怎樣定義呢? 簡單的想應該會是這樣
+
+```typescript
+function printLabel(labeledObj: {label: string}){
+    console.log(labeledObj.label);
+}
+
+let myObj = { age: 10, label: 'Size 10 Object'};
+printLabel(myObj);
+```
+
+上述範例程式碼的  `{label: string} ` 就是用來描述 `labeledObj` 的資料結構，我們當可以用 interface 的方式來替換原本的描述方式，型別檢查機制仍可以正確地進行型別檢查
+
+```typescript
+interface LabeledValue {
+  label: string
+}
+
+function printLabel(labeledObj: LabeledValue){
+    console.log(labeledObj.label);
+}
+
+let myObj = { age: 10, label: 'Size 10 Object'};
+printLabel(myObj);
+```
+
+## Optional Properties
+
+定義 interface 時，有時會遇到某些欄位可有可無的狀況，要在 interface 表示這種狀況，可以使用 `?` 來描述屬性，這樣型別檢查時，就不會強求該屬性存在與否。
+
+```typescript
+interface SquareConfig {
+    color?: string;
+    width?: number;
+}
+
+function createSquare(config: SquareConfig): {color: string; area: number} {
+    let newSquare = {color: "white", area: 100};
+    if (config.color) {
+        newSquare.color = config.color;
+    }
+    if (config.width) {
+        newSquare.area = config.width * config.width;
+    }
+    return newSquare;
+}
+
+let mySquare = createSquare({color: "black"});
+```
+
+TypeScript 2.4版介紹了一個新功能，`weak type detection` ，當一個 interface 內的屬性都是可選參數時，Type-Checker 會強制檢查所傳入的值，至少要有一項是符合 interface 的屬性。拿上述的範例來說，如果 `createSquare` 傳入的物件屬性沒有符合 interface 內的屬性， TypeScript 會顯示錯誤訊息
+
+```typescript
+interface SquareConfig {
+    color?: string;
+    width?: number;
+}
+
+function createSquare(config: SquareConfig): {color: string; area: number} {
+   ...
+}
+
+let mySquare = createSquare({height: 10}); // 錯誤訊息如下
+```
+
+![](images/2017-08-23_21-42-37.jpg)
+
+
+
+
+
+
+
+
 
 ## Class
 
