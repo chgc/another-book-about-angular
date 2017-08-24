@@ -103,9 +103,55 @@ Observable
 
 ### bindCallback
 
+將 callback API 轉換成一個回傳 Observable 的函式
+
+```typescript
+bindCallback(func: function, selector: function, scheduler: Scheduler): function(...params: *): Observable
+```
+
+**使用範例**
+
+```typescript
+function callbackFn(value1, value2, callback) {
+  // value1 output: 1;
+  // value2 output: 2;
+  callback(value1, value2);
+}
+
+let source = Observable.bindCallback(callbackFn, (value1, value2) => {
+  // value1 receive: 1;
+  // value2 receive: 2;
+  return value1 + value2;
+});
+
+source(1, 2).subscribe(value => {
+  // value output: 2;
+  console.log(value);
+});
+```
+
+
+
 ### bindNodeCallback
 
+`bindNodeCallback` 與 `bindCallback` 的用法是一樣的，但是針對 node.js-style callback
+
+**使用範例**
+
+```typescript
+import * as fs from 'fs';
+// fs.readFile('/etc/passwd', 'utf8', callback);
+
+var readFileAsObservable = Observable.bindNodeCallback(fs.readFile);
+var result = readFileAsObservable('./roadNames.txt', 'utf8');
+result.subscribe(x => console.log(x), e => console.error(e));
+```
+
+
+
 ### create
+
+
 
 ### defer
 
