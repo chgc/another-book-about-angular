@@ -90,7 +90,7 @@ x = ["hello", 10]; // OK
 x = [10, "hello"]; // Error
 ```
 
-TypeScript 很聰明的可以判斷目前所選取的資料的型別，如果使用到不屬於該型別可以使用的函數時，在開發時就會顯示錯誤提示
+TypeScript 很聰明的可以判斷目前所選取的資料的型別，如果使用到不屬於該型別可以使用的函式時，在開發時就會顯示錯誤提示
 
 ```typescript
 console.log(x[0].substr(1)); // OK
@@ -174,7 +174,7 @@ list[1] = 100;
 
 ### Void
 
-`void` 這型別是告訴 TypeScript 說，目前的這個函數不會回傳任何資料，或是變數只能接受 `null` 或 `undefined`
+`void` 這型別是告訴 TypeScript 說，目前的這個函式不會回傳任何資料，或是變數只能接受 `null` 或 `undefined`
 
 ```typescript
 function warnUser(): void {
@@ -210,7 +210,7 @@ name = null ; // ok
 
 ### Never
 
-`never` 是一個很特殊的型別，也是在 TypeScript 2.0 所新增的型別之一。`never` 代表**不會有任何值發生**。使用情境可以是用來判斷一個函數是否有涵蓋所有的可能性
+`never` 是一個很特殊的型別，也是在 TypeScript 2.0 所新增的型別之一。`never` 代表**不會有任何值發生**。使用情境可以是用來判斷一個函式是否有涵蓋所有的可能性
 
 ```typescript
 // Inferred return type is number
@@ -310,9 +310,9 @@ f(); // returns '2'
 
 而 `var` 還有另外一個奇怪的特性，就是 `scoping rule`，其實嚴格的說，應該是 JavaScript Hoisting 的特性造成的，根據 MDN 的解釋
 
-> 提升 ( Hoisting ) 是您在 JavaScript 文檔中找不到的項目。提升是在 JavaScript 中需要思考程式片段的前後關係（特別是於創建和執行階段）通常是如何進行的地方，而且，提升可能會引起誤解。例如，提升使變數和函數的宣告被移動到您編寫的程式區塊頂端，但這並非發生於您編寫程式時，此發生於編譯階段，變數和函數的宣告提升會於放入記憶體中時處理，但在您編寫的程式碼中，仍然保留於您所鍵入的位置。
+> 提升 ( Hoisting ) 是您在 JavaScript 文檔中找不到的項目。提升是在 JavaScript 中需要思考程式片段的前後關係（特別是於創建和執行階段）通常是如何進行的地方，而且，提升可能會引起誤解。例如，提升使變數和函式的宣告被移動到您編寫的程式區塊頂端，但這並非發生於您編寫程式時，此發生於編譯階段，變數和函式的宣告提升會於放入記憶體中時處理，但在您編寫的程式碼中，仍然保留於您所鍵入的位置。
 
-簡單的說，變數或是函數的宣告，都會自動被提升到函數或是程式碼的最上面，這個規則有好有壞，先說好的部分
+簡單的說，變數或是函式的宣告，都會自動被提升到函式或是程式碼的最上面，這個規則有好有壞，先說好的部分
 
 ```javascript
 catName("Chloe");
@@ -322,7 +322,7 @@ function catName(name) {
 }
 ```
 
-上列的程式碼，即使函數是在呼叫函數之後才定義的，基於`提升`原則，這段程式碼還是可以正常運作的
+上列的程式碼，即使函式是在呼叫函式之後才定義的，基於`提升`原則，這段程式碼還是可以正常運作的
 
 但是，以下的程式碼範例就是顯示 `提升` 原則造成的思考邏輯上的混淆
 
@@ -350,7 +350,7 @@ function f(shouldInitialize: boolean) {
 }
 ```
 
-簡單的說，用 `var` 定義的變數，沒有真正的 `scope` 觀念，`var` 所認知的 `scoping` 定義是根據函數為 `scoping` 的界線，有人稱之為 `function-scoping`，這就延伸出另外一個很常見的錯誤，**var in for loop**
+簡單的說，用 `var` 定義的變數，沒有真正的 `scope` 觀念，`var` 所認知的 `scoping` 定義是根據函式為 `scoping` 的界線，有人稱之為 `function-scoping`，這就延伸出另外一個很常見的錯誤，**var in for loop**
 
 ```javascript
 function sumMatrix(matrix: number[][]) {
@@ -419,7 +419,7 @@ let a;
    let x = 20; // 錯誤: 在相同的 scope 下不能重複定義 'x'
 
    function f(x) {
-       let x = 100; // 錯誤: 引數已經定義過 'x'
+       let x = 100; // 錯誤: 參數已經定義過 'x'
    }
 
    function g() {
@@ -428,7 +428,7 @@ let a;
    }
    ```
 
-我們現在回頭看剛剛使用 `var` 所寫的函數，當改用 `let` 時，會不會正常的運作
+我們現在回頭看剛剛使用 `var` 所寫的函式，當改用 `let` 時，會不會正常的運作
 
 ```typescript
 function sumMatrix(matrix: number[][]) {
@@ -503,7 +503,7 @@ kitty = {
 
    當然原本的 `input[0]` 的寫法依然可以好好的工作，只是解構賦值寫法不會覺得很簡潔帥氣嗎?
 
-   另外一種應用方式，就是當作函數的引數使用
+   另外一種應用方式，就是當作函式的參數使用
 
    ```typescript
    function f([first, second]: [number, number]) {
@@ -540,7 +540,7 @@ kitty = {
    let newName2 = o.b;
    ```
 
-   當函數引數為物件時，有時我們會將其中一個屬性設為非必要，而這時候我們可以使用解構賦值的方式，賦予預設值
+   當函式參數為物件時，有時我們會將其中一個屬性設為非必要，而這時候我們可以使用解構賦值的方式，賦予預設值
 
    ```typescript
    function keepWholeObject(wholeObject: { a: string, b?: number }) {
@@ -563,7 +563,7 @@ let obj = { x: 1, y: "string" };
 var newObj = {...obj, z: 3, y: 4}; // { x: number, y: number, z: number }
 ```
 
-但還是有些限制，例如遇到某物件內有屬性及函數，透過 `spread` 運算式，只能取出該物件內的屬性。
+但還是有些限制，例如遇到某物件內有屬性及函式，透過 `spread` 運算式，只能取出該物件內的屬性。
 
 ```typescript
 class C {
@@ -581,7 +581,7 @@ clone.m(); // error!
 
 型別檢查是 TypeScript 核心精神之一，尤其是著重於資料結構描述，稱為 `duck typing` 或是 `structural subtyping`。Interface 是 TypeScript 提供一種用來描述資料結構的強大方法，Interface 只會存在於開發階段，並不會隨著編譯一起輸出至 JavaScript。
 
-還記得在一開始介紹基本型別的地方，我們可以在函數定義所接受的引數型別為何，如果引數的型別是一個物件型態，這時會怎樣定義呢? 簡單的想應該會是這樣
+還記得在一開始介紹基本型別的地方，我們可以在函式定義所接受的參數型別為何，如果參數的型別是一個物件型態，這時會怎樣定義呢? 簡單的想應該會是這樣
 
 ```typescript
 function printLabel(labeledObj: {label: string}){
@@ -656,7 +656,7 @@ let mySquare = createSquare({height: 10}); // 錯誤訊息如下
 
 ### Readonly properties
 
-在函數內可以定義常數，在 interface 裡，`readonly` 的功能就與 `const`的功能是一樣的，當實作該 interface 時，只允許初始化時賦予屬性資料，之後就不能做任何修改。而 `readonly` 與 `const` 的差別是，屬性使用`readonly`，變數使用`const` 。
+在函式內可以定義常數，在 interface 裡，`readonly` 的功能就與 `const`的功能是一樣的，當實作該 interface 時，只允許初始化時賦予屬性資料，之後就不能做任何修改。而 `readonly` 與 `const` 的差別是，屬性使用`readonly`，變數使用`const` 。
 
 ```typescript
 interface Point {
@@ -687,7 +687,7 @@ a = ro as number[];
 
 ### Function Type
 
-interface 不只有定義屬性，也可以用來定義函數，interface 針對函數的定義有分兩種，一種是單純函數定義，如下列範例
+interface 不只有定義屬性，也可以用來定義函式，interface 針對函式的定義有分兩種，一種是單純函式定義，如下列範例
 
 ```typescript
 interface SearchFunc {
@@ -701,7 +701,7 @@ mySearch = function(source: string, subString: string) {
 }
 ```
 
-實作引數名稱不需與 interface 內所定義的名稱相同，TypeScript 的型別檢查只在意引數及回傳值的型別是否正確。
+實作參數名稱不需與 interface 內所定義的名稱相同，TypeScript 的型別檢查只在意參數及回傳值的型別是否正確。
 
 ### Indexable Types
 
@@ -878,7 +878,7 @@ let greeter = new Greeter("world");
 
 1. `extends` 是繼承的關鍵字
 2. `super` 會執行底層 constructor
-3. 函數會由上往下執行
+3. 函式會由上往下執行
 
 ```typescript
 class Animal {
@@ -917,11 +917,11 @@ tom.move(34);
 // Tommy the Palomino moved 34m.
 ```
 
-上面的範例程式碼裡，有一個 `Animal` 的底層物件，而 `Snake` 及 `Horse` 是繼承 `Animal` 物件的，這表示即使 `Snake` 和 `Horse` 已經擁有 `Animal` 的 `move` 函數和 `name` 的屬性。
+上面的範例程式碼裡，有一個 `Animal` 的底層物件，而 `Snake` 及 `Horse` 是繼承 `Animal` 物件的，這表示即使 `Snake` 和 `Horse` 已經擁有 `Animal` 的 `move` 函式和 `name` 的屬性。
 
 子類別物件如果有 `constructor` 時，就必須呼叫 `super` 來執行被繼承物件的 `constructor`。
 
-另外一點要留意的是，子類別物件有實作與繼承物件相同函數時，兩個函數都會被執行，執行的順序是從子類別物件先執行後在執行繼承物件的函數。
+另外一點要留意的是，子類別物件有實作與繼承物件相同函式時，兩個函式都會被執行，執行的順序是從子類別物件先執行後在執行繼承物件的函式。
 
 
 
@@ -947,7 +947,7 @@ class Animal {
 
 #### Private
 
-`private` 限制了外部對於存取物件屬性與函數的能力，在開發時 TypeScript 所提供的 intellisense 功能，會看不到設定為 private 的屬性或是函數。
+`private` 限制了外部對於存取物件屬性與函式的能力，在開發時 TypeScript 所提供的 intellisense 功能，會看不到設定為 private 的屬性或是函式。
 
 ```typescript
 class Animal {
@@ -1096,11 +1096,11 @@ class Grid {
 }
 ```
 
-我們可以看出靜態屬性與一般屬性的差異，一般屬性的存取是透過 `this` ，而靜態屬性是透過物件名稱 ( `Grid.origin` )，`static` 也適用於函數。
+我們可以看出靜態屬性與一般屬性的差異，一般屬性的存取是透過 `this` ，而靜態屬性是透過物件名稱 ( `Grid.origin` )，`static` 也適用於函式。
 
 ### Abstract Classes
 
-`Abstract Classes` 一定是用來繼承使用，不能直接被建立。`Abstract classes` 具有 class 與 interface 兩者的特性，`abstract` 關鍵字是設定必須實作的函數 ( 功能與 interface 相同)
+`Abstract Classes` 一定是用來繼承使用，不能直接被建立。`Abstract classes` 具有 class 與 interface 兩者的特性，`abstract` 關鍵字是設定必須實作的函式 ( 功能與 interface 相同)
 
 ```typescript
 abstract class Department {
@@ -1165,7 +1165,7 @@ console.log(greeter2.greet()); // 輸出: Hey, there!
 
 #### Using a class as an interface
 
-這技巧在 interface 有提過，當 interface 繼承 class 時，該 class 會被轉換成 interface 模式，相關屬性函數都會被繼承，但原本實作功能就不會保留了。
+這技巧在 interface 有提過，當 interface 繼承 class 時，該 class 會被轉換成 interface 模式，相關屬性函式都會被繼承，但原本實作功能就不會保留了。
 
 ```typescript
 class Point {
@@ -1183,6 +1183,261 @@ let point3d: Point3d = {x: 1, y: 2, z: 3};
 
 
 ## Functions
+
+Functions 可以說是建置一個應用程式時所需的零件，TypeScript 提供很多方式可以設計 Functions 的架構設計，也提供額外的功能，可以增加開發效益。
+
+傳統的 JavaScript Functions 有兩種寫法，具名函式 ( Named function) 與匿名函式 ( Anonymous function)
+
+```typescript
+// 具名函式
+function add(x, y) {
+    return x + y;
+}
+
+// 匿名函式
+let myAdd = function(x, y) { return x+y; };
+```
+
+變數與函式的關係，如果在函式外定義一個變數，如果函式內沒有相同的變數名稱，則會讀取到函式外所定義的變數
+
+```typescript
+let z = 100;
+
+function addToZ(x, y) {
+    return x + y + z;
+}
+```
+
+### Function Types
+
+賦予函式型別，可以讓開發時了解該函式要傳入的參數型別，與回傳值的型別為何
+
+```typescript
+function add(x: number, y: number): number {
+    return x + y;
+}
+
+let myAdd = function(x: number, y: number): number { return x+y; };
+```
+
+定義函式型別
+
+```typescript
+let myAdd: (x: number, y: number) => number =
+    function(x: number, y: number): number { return x+y; };
+```
+
+由於函式所定義的型別，參數名稱並不在型別檢查的範圍內，所以改寫下面的樣式，可讀性會更高
+
+```typescript
+let myAdd: (baseValue:number, increment:number) => number =
+    function(x: number, y: number): number { return x + y; };
+```
+
+其實因為我們已經有定義函式參數型別，所以在後面實作時，就不需要在特定去定義型別了，稱為「contextual typing」(取決於上下文的型別判斷)
+
+```typescript
+let myAdd: (baseValue:number, increment:number) => number =
+    function(x, y) { return x + y; };
+```
+
+### Optional and Default Parameters
+
+在 TypeScript 裡，函式的參數預設皆為必填，為了避免傳入不必要的 null 或 undefined，TypeScript 提供非強制性的選項，在參數後加上 `?` 即表示該參數為非強制必填。
+
+```typescript
+function buildName(firstName: string, lastName: string) {
+    return firstName + " " + lastName;
+}
+
+let result1 = buildName("Bob");                  // 錯誤, 太少引數
+let result2 = buildName("Bob", "Adams", "Sr.");  // 錯誤, 太多引數
+let result3 = buildName("Bob", "Adams");
+
+function buildName(firstName: string, lastName?: string) {
+    return firstName + " " + lastName;
+}
+
+let result1 = buildName("Bob");                  // 正確
+let result2 = buildName("Bob", "Adams", "Sr.");  // 錯誤, 太多引數
+let result3 = buildName("Bob", "Adams");         
+```
+
+透過 `?` 的方式來定義參數，在函式內使用該參數時，就需要判斷是否為 undefined 來得知該參數是否有接收到引數，通常這一類的參數都會有一個預設值 ( default value)，我們也可以直接在參數後面設定預設值
+
+```typescript
+function buildName(firstName: string, lastName = "Smith") {
+    return firstName + " " + lastName;
+}
+
+let result1 = buildName("Bob");                  // works correctly now, returns "Bob Smith"
+let result2 = buildName("Bob", undefined);       // still works, also returns "Bob Smith"
+let result3 = buildName("Bob", "Adams", "Sr.");  // error, too many parameters
+let result4 = buildName("Bob", "Adams");         // ah, just right
+```
+
+一旦我們給予預設值時，就不需要在特定標示該參數為 optional 了，參數自動會被認定為非必要參數。
+
+這兩種用法的型別定義都一樣，而且也沒有說哪一種比較好，請依實際的狀況決定。
+
+```typescript
+(firstName: string, lastName?: string) => string
+```
+
+還有一個需要提醒的事情是，使用 `?` 的參數，是不能放在必填參數的前面，必須放在後面，但是指定預設值是可以放在任何位置，還得留意引數順序。
+
+```typescript
+// 這種定義方式是不允許的
+function buildName(firstName?: string, lastName: string) {
+    return firstName + " " + lastName;
+}
+
+// 這種定義方式是允許的
+function buildName(firstName = "Will", lastName: string) {
+    return firstName + " " + lastName;
+}
+
+let result1 = buildName("Bob");                  // error, too few parameters
+let result2 = buildName("Bob", "Adams", "Sr.");  // error, too many parameters
+let result3 = buildName("Bob", "Adams");         // okay and returns "Bob Adams"
+let result4 = buildName(undefined, "Adams");     // okay and returns "Will Adams"
+```
+
+### Rest Parameters
+
+不論是必填 ( required )、非必要 ( optional ) 或是預設值 ( default ) 都只能一個參數接受一個引數，有些情況下，我們想要一次傳入多個引數，但是因為不確定會有多少個引數會被傳入，所以不想也不能定義所有參數，這時候可以可以透過 `...` 的方式來定義 `剩餘參數`，為陣列型別。
+
+```typescript
+let buildNameFun: (fname: string, ...rest: string[]) => string = buildName;
+function buildName(firstName: string, ...restOfName: string[]) {
+    return firstName + " " + restOfName.join(" ");
+}
+
+let employeeName = buildName("Joseph", "Samuel", "Lucas", "MacKinzie");
+```
+
+### this
+
+`this` 這主題大概可以寫一本書了，但這裡我們就只針對跟 function 有關的做說明
+
+#### this and arrow functions
+
+在 JavaScript 的 this 當 function 被執行時會被建立出來，雖然很便利，但是很容易搞混目前的 `this` 到底是指誰
+
+```typescript
+let deck = {
+    suits: ["hearts", "spades", "clubs", "diamonds"],
+    cards: Array(52),
+    createCardPicker: function() {
+        return function() {
+            let pickedCard = Math.floor(Math.random() * 52);
+            let pickedSuit = Math.floor(pickedCard / 13);
+
+            return {suit: this.suits[pickedSuit], card: pickedCard % 13};
+        }
+    }
+}
+
+let cardPicker = deck.createCardPicker();
+let pickedCard = cardPicker();
+
+alert("card: " + pickedCard.card + " of " + pickedCard.suit);
+```
+
+在這個錯誤程式範例裡， this.suits 是不存在的，原因是 `careteCardPicker` 會回傳一個函式，而 `pickedCard` 是獨立且註冊於最上層，所以 this 會是 `window`而非 deck 物件。需要留意的是，如果在 `strict` 模式，這程式碼的 this 會是 undefined。
+
+假設我們要修正上述有問題的程式碼，又應該要怎麼處理呢? 這時要透過 ES2015 介紹的新功能，`arrow` 語法來表示函式。 `Array functions` 會擷取建立函式所在的 this，而非執行所在地的 this。
+
+```typescript
+let deck = {
+    suits: ["hearts", "spades", "clubs", "diamonds"],
+    cards: Array(52),
+    createCardPicker: function() {
+      // array functions here
+        return () => {
+            let pickedCard = Math.floor(Math.random() * 52);
+            let pickedSuit = Math.floor(pickedCard / 13);
+
+            return {suit: this.suits[pickedSuit], card: pickedCard % 13};
+        }
+    }
+}
+
+let cardPicker = deck.createCardPicker();
+let pickedCard = cardPicker();
+
+alert("card: " + pickedCard.card + " of " + pickedCard.suit);
+```
+
+#### this parameters
+
+透過 TypeScript 的檢查，`this.suits` 仍被判定為 any 型別，原因是 `this` 是來自函式本身，我們也可以把 this 寫出來，來調整一下原本的程式碼
+
+```typescript
+interface Card {
+    suit: string;
+    card: number;
+}
+interface Deck {
+    suits: string[];
+    cards: number[];
+    createCardPicker(this: Deck): () => Card;
+}
+let deck: Deck = {
+    suits: ["hearts", "spades", "clubs", "diamonds"],
+    cards: Array(52),
+    // NOTE: The function now explicitly specifies that its callee must be of type Deck
+    createCardPicker: function(this: Deck) {
+        return () => {
+            let pickedCard = Math.floor(Math.random() * 52);
+            let pickedSuit = Math.floor(pickedCard / 13);
+
+            return {suit: this.suits[pickedSuit], card: pickedCard % 13};
+        }
+    }
+}
+```
+
+現在，即使使用 `noImplicitThis` 也不出現任何錯誤提示了
+
+#### this parameters in callbacks
+
+另外使用 this 會出錯的情境是 `this` in callbacks. 因為 callback 函式的執行方式會跟一般函式的執行方式相同，所以 `this` 會是 undefined，這錯誤是有技巧避免的。
+
+```typescript
+interface UIElement {
+    addClickListener(onclick: (this: void, e: Event) => void): void;
+}
+```
+
+`this: void` 表示 `addClickListener` 期待 `onclick` 是一個函式且不需要 `this`，接下來實作 class 並設定 callback
+
+```typescript
+class Handler {
+    info: string;
+    onClickGood(this: void, e: Event) {
+        // can't use this here because it's of type void!
+        console.log('clicked!');
+    }
+}
+let h = new Handler();
+uiElement.addClickListener(h.onClickGood);
+```
+
+如果我們真的需要將結果更新到 class 內的屬性時，又該如何改寫呢?
+
+```typescript
+class Handler {
+    info: string;
+    onClickGood = (e: Event) => {
+        this.info = e.message;        
+    }
+}
+```
+
+這樣的寫法不會有問題是因為 arrow function 不會擷取 `this`，所以可以通過 `this: void` 的檢查。
+
+
 
 ## Generics
 
