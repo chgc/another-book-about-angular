@@ -788,7 +788,7 @@ Angular CLI 有提供設定檔 `.angular-cli.json` ，這個設定檔內有分�
     - *port* (`number`): 網頁伺服器連接阜，預設值： `4200`.
     - *host* (`string`): 網頁伺服器網址，預設值： `localhost`.
     - *ssl* (`boolean`): 網頁伺服器起動 `ssl`，預設值：`false`
-    - sslKey* (`string`): 指定 SSL 金鑰位置給網站伺服器使用. 預設值： `ssl/server.key`.
+    - sslKey (`string`): 指定 SSL 金鑰位置給網站伺服器使用. 預設值： `ssl/server.key`.
     - *sslCert* (`string`): 指定 SSL 憑證位置給網站伺服器使用. 預設值： `ssl/server.crt`.
     - *proxyConfig* (`string`): 設定 `Proxy` 設定檔案位置
 - **packageManager** (`string`): 設定套件管理工具，可以以下工具 `npm`, `cnpm` and `yarn`.

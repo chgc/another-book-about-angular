@@ -1,11 +1,11 @@
 # Summary
 
 * [引言](README.md)
-* [設定](chapter1/README.Mmd)
+* [設定](chapter1/README.md)
   * [NPM Packages](chapter1/npm-package.md)
   * [TypeScript 設定](chapter1/tsconfig.md)
   * [Angular CLI](chapter1/angularcli.md)
-* [TypeScript]()
+* [TypeScript](chapter2/typescript.md)
 * [RxJS]()
 * [架構]()
   * [ngModules]()
