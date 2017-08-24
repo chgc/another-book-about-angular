@@ -10,9 +10,9 @@ TypeScript 是什麼?
 
 
 
+# 基礎篇
+
 這一個章節，我們會詳細的介紹 TypeScript 的功能
-
-
 
 ##  Basic Types
 
@@ -1437,11 +1437,9 @@ class Handler {
 
 這樣的寫法不會有問題是因為 arrow function 不會擷取 `this`，所以可以通過 `this: void` 的檢查。
 
-
+# 進階篇
 
 ## Generics
-
-## Enums
 
 ## Type Inference
 
