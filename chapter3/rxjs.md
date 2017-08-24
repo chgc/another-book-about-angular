@@ -130,8 +130,6 @@ source(1, 2).subscribe(value => {
 });
 ```
 
-
-
 ### bindNodeCallback
 
 `bindNodeCallback` 與 `bindCallback` 的用法是一樣的，但是針對 node.js-style callback
@@ -147,9 +145,41 @@ var result = readFileAsObservable('./roadNames.txt', 'utf8');
 result.subscribe(x => console.log(x), e => console.error(e));
 ```
 
-
-
 ### create
+
+建立自訂 Observable，`create` 會送出一個 observer 物件，包含 `next`、`error`、`complete` 三個函式。
+
+透過這三個函式來控制 Observable 資料的輸出
+
+1. next：送出資料
+2. error：送出錯誤訊息，之後就會結束 Observable
+3. complete：結束 Observable，之後不會有任何輸出值
+
+```typescript
+var observable = Observable.create(function (observer) {
+  observer.next(1);
+  observer.next(2);
+  observer.next(3);
+  observer.complete();
+});
+observable.subscribe(
+  value => console.log(value),
+  err => {},
+  () => console.log('this is the end')
+);
+```
+
+```typescript
+const observable = Observable.create((observer) => {
+  observer.error('something went really wrong...');
+});
+
+observable.subscribe(
+  value => console.log(value), // will never be called
+  err => console.log(err),
+  () => console.log('complete') // will never be called
+);
+```
 
 
 
