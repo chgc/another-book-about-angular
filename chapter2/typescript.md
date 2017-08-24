@@ -845,7 +845,342 @@ TypeScript 遇到 interface 繼承 classes 的狀態時，會自動將 classes �
 
 
 
-## Class
+## Classes
+
+在 ES2015 出現之前，傳統的 JavaScript 使用  Functions 和 prototype-based 模式來設計可重複使用的物件，這種設計模式讓習慣物件導向的後端人員想要學習 JavaScript 時，需要踏過很大的門檻跟心魔的煎熬。自從 ES2015 介紹 Class 的設計模式，這讓熟悉物件導的開發人員，可以很快速使用 Class-based 的模式開發 JavaScript。
+
+即使 JavaScript 已經推出新功能規格的 ES2015 及以後，並不代表瀏覽器是支援的，而 TypeScript 能幫我們解決這部分的困惱，TypeScript 可以轉譯成瀏覽器可以支援的 ES5 的版本；我們可以使用 ES2015 及以後規格語法開發應用程式，剩下的工作就交給 TypeScript。
+
+### Classes
+
+有寫過 Java 或 c# 的開發人員，對於以下的語法格式應該是熟悉的
+
+```typescript
+class Greeter {
+    greeting: string;
+    constructor(message: string) {
+        this.greeting = message;
+    }
+    greet() {
+        return "Hello, " + this.greeting;
+    }
+}
+
+let greeter = new Greeter("world");
+
+```
+
+我們所預期 Class 應有的特性，例如說繼承，實作介面、存取修飾詞，靜態等，TypeScript 都有提供
+
+###Inheritance
+
+繼承是物件導向裡一個重要的觀念。幾個重點先知道
+
+1. `extends` 是繼承的關鍵字
+2. `super` 會執行底層 constructor
+3. 函數會由上往下執行
+
+```typescript
+class Animal {
+    name: string;
+    constructor(theName: string) { this.name = theName; }
+    move(distanceInMeters: number = 0) {
+        console.log(`${this.name} moved ${distanceInMeters}m.`);
+    }
+}
+
+class Snake extends Animal {
+    constructor(name: string) { super(name); }
+    move(distanceInMeters = 5) {
+        console.log("Slithering...");
+        super.move(distanceInMeters);
+    }
+}
+
+class Horse extends Animal {
+    constructor(name: string) { super(name); }
+    move(distanceInMeters = 45) {
+        console.log("Galloping...");
+        super.move(distanceInMeters);
+    }
+}
+
+let sam = new Snake("Sammy the Python");
+let tom: Animal = new Horse("Tommy the Palomino");
+
+sam.move(); 
+// Slithering...
+// Sammy the Python moved 5m.
+
+tom.move(34);
+// Galloping...
+// Tommy the Palomino moved 34m.
+```
+
+上面的範例程式碼裡，有一個 `Animal` 的底層物件，而 `Snake` 及 `Horse` 是繼承 `Animal` 物件的，這表示即使 `Snake` 和 `Horse` 已經擁有 `Animal` 的 `move` 函數和 `name` 的屬性。
+
+子類別物件如果有 `constructor` 時，就必須呼叫 `super` 來執行被繼承物件的 `constructor`。
+
+另外一點要留意的是，子類別物件有實作與繼承物件相同函數時，兩個函數都會被執行，執行的順序是從子類別物件先執行後在執行繼承物件的函數。
+
+
+
+### 存取修飾詞
+
+public、private、protected、readonly 皆屬於存取修飾詞，在物件導向設計下，透過存取修飾詞來決定有哪些內容是可以對外開發，及對外開放的範圍。
+
+※注意：存取修飾詞的功能僅限於開發模式
+
+#### Public by default
+
+public 為預設的存取修飾詞，這表示有沒有標明 `public` 是沒有差別的。
+
+```typescript
+class Animal {
+    public name: string;
+    public constructor(theName: string) { this.name = theName; }
+    public move(distanceInMeters: number) {
+        console.log(`${this.name} moved ${distanceInMeters}m.`);
+    }
+}
+```
+
+#### Private
+
+`private` 限制了外部對於存取物件屬性與函數的能力，在開發時 TypeScript 所提供的 intellisense 功能，會看不到設定為 private 的屬性或是函數。
+
+```typescript
+class Animal {
+    private name: string;
+    constructor(theName: string) { this.name = theName; }
+}
+
+new Animal("Cat").name; // 錯誤: 'name' 是私有屬性
+```
+
+#### Protected
+
+protected 與 private 很類似，protected 是開放給繼承物件使用，但還不到 public 等級
+
+```typescript
+class Person {
+    protected name: string;
+    constructor(name: string) { this.name = name; }
+}
+
+class Employee extends Person {
+    private department: string;
+
+    constructor(name: string, department: string) {
+        super(name);
+        this.department = department;
+    }
+
+    public getElevatorPitch() {
+        return `Hello, my name is ${this.name} and I work in ${this.department}.`;
+    }
+}
+
+let howard = new Employee("Howard", "Sales");
+console.log(howard.getElevatorPitch());
+console.log(howard.name); // 錯誤: 無法存取 name 屬性
+```
+
+如果 constructor 也標示為 protected 時，表示該物件不能單獨被建立，只能被用於繼承用途。
+
+```typescript
+class Person {
+    protected name: string;
+    protected constructor(theName: string) { this.name = theName; }
+}
+
+// Employee 可以繼承 Person 物件
+class Employee extends Person {
+    private department: string;
+
+    constructor(name: string, department: string) {
+        super(name);
+        this.department = department;
+    }
+
+    public getElevatorPitch() {
+        return `Hello, my name is ${this.name} and I work in ${this.department}.`;
+    }
+}
+
+let howard = new Employee("Howard", "Sales");
+let john = new Person("John"); // 錯誤: The 'Person' constructor is protected
+```
+
+#### Readonly
+
+`readonly` 在 interface 小節有介紹過， `readonly` 是用來定義屬性，讓屬性只能在宣告時賦予值，之後就不能再行變更了
+
+```typescript
+class Octopus {
+    readonly name: string;
+    readonly numberOfLegs: number = 8;
+    constructor (theName: string) {
+        this.name = theName;
+    }
+}
+let dad = new Octopus("Man with the 8 strong legs");
+dad.name = "Man with the 3-piece suit"; // 錯誤! name 屬唯獨屬性.
+```
+
+#### Parameter properties
+
+TypeScript 提供一個快速定義屬性的方法，我們可以在 constructor 時，就定義屬性，適用於所有的存取修飾詞
+
+```typescript
+class Octopus {
+    readonly numberOfLegs: number = 8;
+    constructor(readonly name: string, public age: number) {
+    }
+}
+```
+
+### Accessors
+
+一般的情況，屬性的只能單純的接受回傳值，如果我們想要在存取屬性時做加工呢，就必須透過 `set` 與 `get` 的幫忙，這兩者可以個別存在。
+
+```typescript
+class Employee {    
+	private firstName: string;
+    private lastName: string;
+  
+    get fullName(): string {
+        return `My Name is ${this.firstName} ${this.lastName}`;
+    }
+  	
+    set fullName(firstName: string, lastName: string){
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+}
+
+let employee = new Employee('Bob', 'Smith');
+console.log(employee.fullName); // 輸出: My Name is Bob Smith
+
+```
+
+另一種使用情境是只有 `get` 出現，等同於 `readonly` 的效果， fullName 屬性只能讀取，不能存入。
+
+```typescript
+class Employee {    
+	constructor(private firstName: string, private lastName: string){}
+  
+    get fullName(): string {
+        return `My Name is ${this.firstName} ${this.lastName}`;
+    }
+}
+
+let employee = new Employee('Bob', 'Smith');
+console.log(employee.fullName); // 輸出: My Name is Bob Smith
+
+```
+
+### Static Properties
+
+靜態屬性是物件不需要被建立也可以被存取的屬性。
+
+```typescript
+class Grid {
+    static origin = {x: 0, y: 0};
+    calculateDistanceFromOrigin(point: {x: number; y: number;}) {
+        let xDist = (point.x - Grid.origin.x);
+        let yDist = (point.y - Grid.origin.y);
+        return Math.sqrt(xDist * xDist + yDist * yDist) / this.scale;
+    }
+    constructor (public scale: number) { }
+}
+```
+
+我們可以看出靜態屬性與一般屬性的差異，一般屬性的存取是透過 `this` ，而靜態屬性是透過物件名稱 ( `Grid.origin` )，`static` 也適用於函數。
+
+### Abstract Classes
+
+`Abstract Classes` 一定是用來繼承使用，不能直接被建立。`Abstract classes` 具有 class 與 interface 兩者的特性，`abstract` 關鍵字是設定必須實作的函數 ( 功能與 interface 相同)
+
+```typescript
+abstract class Department {
+
+    abstract printMeeting(): void; // must be implemented in derived classes
+    constructor(public name: string) {
+    }
+
+    printName(): void {
+        console.log("Department name: " + this.name);
+    }   
+}
+
+class AccountingDepartment extends Department {
+
+    constructor() {
+        super("Accounting and Auditing"); // constructors in derived classes must call super()
+    }
+
+    printMeeting(): void {
+        console.log("The Accounting Department meets each Monday at 10am.");
+    }
+
+    generateReports(): void {
+        console.log("Generating accounting reports...");
+    }
+}
+```
+
+### 應用技巧
+
+#### static property
+
+修改 static property 的方式
+
+```typescript
+class Greeter {
+    static standardGreeting = "Hello, there";
+    greeting: string;
+    greet() {
+        if (this.greeting) {
+            return "Hello, " + this.greeting;
+        }
+        else {
+            return Greeter.standardGreeting;
+        }
+    }
+}
+
+let greeter1: Greeter;
+greeter1 = new Greeter();
+console.log(greeter1.greet()); // 輸出: Hello, there
+
+let greeterMaker: typeof Greeter = Greeter;
+greeterMaker.standardGreeting = "Hey there!";
+
+let greeter2: Greeter = new greeterMaker();
+console.log(greeter2.greet()); // 輸出: Hey, there!
+```
+
+
+
+#### Using a class as an interface
+
+這技巧在 interface 有提過，當 interface 繼承 class 時，該 class 會被轉換成 interface 模式，相關屬性函數都會被繼承，但原本實作功能就不會保留了。
+
+```typescript
+class Point {
+    x: number;
+    y: number;
+}
+
+interface Point3d extends Point {
+    z: number;
+}
+
+let point3d: Point3d = {x: 1, y: 2, z: 3};
+```
+
+
 
 ## Functions
 
