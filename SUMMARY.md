@@ -6,7 +6,7 @@
   * [TypeScript 設定](chapter1/tsconfig.md)
   * [Angular CLI](chapter1/angularcli.md)
 * [TypeScript](chapter2/typescript.md)
-* [RxJS]()
+* [RxJS](chapter3/rxjs.md)
 * [架構]()
   * [ngModules]()
   * [Bootstrapping]()
