@@ -157,6 +157,8 @@ result.subscribe(x => console.log(x), e => console.error(e));
 
 建立自訂 Observable，`create` 會送出一個 observer 物件，包含 `next`、`error`、`complete` 三個函式。
 
+![](images/create.png)
+
 透過這三個函式來控制 Observable 資料的輸出
 
 1. next：送出資料
@@ -193,6 +195,8 @@ observable.subscribe(
 
 `defer` 是 Observable 工廠，`defer` 接受傳入一個會回傳 Observable 或是 Promise 的函式
 
+![](images/defer.png)
+
 **使用介面**
 
 ```typescript
@@ -215,6 +219,8 @@ clicksOrInterval.subscribe(x => console.log(x));
 ### from
 
 接受陣列，Promise 或是可以 iterable 物件資料並轉換成 Observable (串流模式)
+
+![](images/from.png)
 
 **使用介面**
 
@@ -250,6 +256,8 @@ result.subscribe(x => console.log(x));
 
 轉換 Dom events 、Node EventEmitter events 或其他的事件至 Observable
 
+![](images/fromEvent.png)
+
 **使用介面**
 
 ```typescript
@@ -266,6 +274,8 @@ clicks.subscribe(x => console.log(x));
 ### fromEventPattern
 
 轉換 `addHandler` 和 `removeHandler` 至 Observable，會在 subscribe 時執行 addHandler 函式，而在 unsubscribe 時執行 removeHandler 函式
+
+![](images/fromEventPattern.png)
 
 **使用介面**
 
@@ -314,6 +324,8 @@ result.subscribe(x => console.log(x), e => console.error(e));
 
 建立一個會定時( ms )發送資料的 Observable
 
+![](images/interval.png)
+
 **使用介面**
 
 ```typescript
@@ -330,6 +342,8 @@ numbers.subscribe(x => console.log(x));
 ### never
 
 建立一個不會發送任何資料的 Observable，主要為測試用途。
+
+![](images/never.png)
 
 **使用介面**
 
@@ -351,6 +365,8 @@ result.subscribe(x => console.log(x), info, info);
 
 直接回傳 `complete` 的 observable，主要為測試用途。
 
+![](images/empty.png)
+
 **使用介面**
 
 ```typescript
@@ -370,6 +386,8 @@ result.subscribe(x => console.log(x));
 ### throw
 
 回傳 `error` 的 observable
+
+![](images/throw.png)
 
 **使用介面**
 
@@ -393,6 +411,8 @@ result.subscribe(x => console.log(x), e => console.error(e));
 
 回傳一系列資料的 Observable
 
+![](images/of.png)
+
 **使用介面**
 
 ```typescript
@@ -413,6 +433,8 @@ result.subscribe(x => console.log(x));
 ### repeat
 
 重複執行原有的 Observable n 次
+
+![](images/repeat.png)
 
 **使用介面**
 
@@ -438,6 +460,8 @@ source.subscribe(x=> console.log(x)); // 輸出：1, 2, 1, 2, 1, 2, 1,2
 ### repeatWhen
 
 根據 notifications 來決定重複的時機，可以利用 `complete` 或 `error` 來取消重複執行的動作
+
+![](images/repeatWhen.png)
 
 **使用介面**
 
@@ -468,6 +492,8 @@ source.subscribe(x => console.log(x));
 
 一個 Observable 經設定開始與數量後，可以產生一系列的數列資料
 
+![](images/range.png)
+
 **使用介面**
 
 ```typescript
@@ -487,6 +513,8 @@ numbers.subscribe(x => console.log(x));
 ### timer
 
 是 interval + delay 組合功能的 Observable
+
+![](images/timer.png)
 
 **使用介面**
 
@@ -508,6 +536,275 @@ numbers.subscribe(x => console.log(x));
 
 
 ## Transformation Operators
+
+### map
+
+根據資料轉型的函式，將 Observable 發出的資料做轉型
+
+![](images/map.png)
+
+**使用介面**
+
+```typescript
+map(project: function(value: T, index: number): R, thisArg: any): Observable<R>
+```
+
+**使用範例**
+
+```typescript
+Observable.of(1, 2, 3, 4, 5)
+    .map((value, idx) => {
+      return value * (idx % 2 == 0 ? 1 : 2);
+    })
+    .subscribe(value => console.log(value)); // 輸出: 1, 4, 3, 8, 5
+```
+
+※ `map` 是 RxJS 使用最頻繁之一的 operators
+
+### mapTo
+
+送出一個固定的值
+
+![](images/mapTo.png)
+
+**使用介面**
+
+```typescript
+mapTo(value: any): Observable
+```
+
+**使用範例**
+
+```typescript
+Observable.of(1, 2, 3, 4, 5)
+    .mapTo('Hi')
+    .subscribe(value => console.log(value)); // 輸出：Hi, Hi, Hi, Hi, Hi
+```
+
+### concatMap
+
+依序地結合兩個 Observable 發出的資料並做轉換
+
+![](images/concatMap.png)
+
+**使用介面**
+
+```typescript
+concatMap(project: function(value: T, ?index: number): ObservableInput, resultSelector: function(outerValue: T, innerValue: I, outerIndex: number, innerIndex: number): any): Observable source
+```
+
+**使用範例**
+
+```typescript
+Observable.of(1, 2, 3, 4, 5)
+    .concatMap(
+        (value, idx) => {
+          const _v = value * (idx % 2 == 0 ? 1 : 2);
+          return Observable.of(_v);// 輸出：1, 4, 3, 8, 5
+        },
+        (outerValue, innerValue) => {
+          console.log({outValue, innerValue}); // 輸出：{1,1},{2,4},{3,3},{4,8},{5,5}
+          return outerValue * innerValue
+        })
+    .subscribe(value => console.log(value));// 輸出：1, 8, 9, 32, 25
+```
+
+### concatMapTo
+
+依序地結合兩個 Observable 並送出一個固定的值
+
+![](images/concatMapTo.png)
+
+**使用介面**
+
+```typescript
+concatMapTo(innerObservable: ObservableInput, resultSelector: function(outerValue: T, innerValue: I, outerIndex: number, innerIndex: number): any): Observable
+```
+
+**使用範例**
+
+```typescript
+Observable.of(1,2,3,4,5)
+    .concatMapTo(
+        Observable.of('Hi'),
+        (outerValue, innerValue) => {
+          return innerValue + ' ' + outerValue;
+        })
+    .subscribe(value => console.log(value)); // 輸出: Hi 1, Hi 2, Hi 3, Hi 4, Hi 5
+```
+
+### mergeMap
+
+依資料發生的時序結合兩個 Observable 並做資料轉換
+
+![](images/mergeMap.png)
+
+**使用介面**
+
+```typescript
+mergeMap(project: function(value: T, ?index: number): ObservableInput, resultSelector: function(outerValue: T, innerValue: I, outerIndex: number, innerIndex: number): any, concurrent: number): Observable
+```
+
+**使用範例**
+
+```typescript
+Observable.of(1, 2, 3, 4, 5)
+    .mergeMap(
+        (value, idx) => {
+          const _v = value * (idx % 2 == 0 ? 1 : 2);
+          return Observable.of(_v);// 輸出：1, 4, 3, 8, 5
+        },
+        (outerValue, innerValue) => {
+          console.log({outerValue, innerValue}); // 輸出：{1,1},{2,4},{3,3},{4,8},{5,5}
+          return outerValue * innerValue
+        })
+    .subscribe(value => console.log(value));// 輸出：1, 8, 9, 32, 25
+```
+
+
+
+### mergeMapTo
+
+依資料發生的時序結合兩個 Observable 並送出一個固定的值
+
+![](images/mergeMapTo.png)
+
+**使用介面**
+
+```typescript
+ mergeMapTo(innerObservable: ObservableInput, resultSelector: function(outerValue: T, innerValue: I, outerIndex: number, innerIndex: number): any, concurrent: number): Observable
+```
+
+**使用範例**
+
+```typescript
+Observable.of(1,2,3,4,5)
+    .mergeMapTo(
+        Observable.of('Hi'),
+        (outerValue, innerValue) => {
+          return innerValue + ' ' + outerValue;
+        })
+    .subscribe(value => console.log(value)); // 輸出: Hi 1, Hi 2, Hi 3, Hi 4, Hi 5
+```
+
+### switchMap
+
+取最新發生的資料合併兩個 Observable 並做轉換
+
+![](images/switchMap.png)
+
+**使用介面**
+
+```typescript
+switchMap(project: function(value: T, ?index: number): ObservableInput, resultSelector: function(outerValue: T, innerValue: I, outerIndex: number, innerIndex: number): any): Observable
+```
+
+**使用範例**
+
+```typescript
+const clicks = Rx.Observable.fromEvent(document, 'click');
+const result = clicks.switchMap((ev) => Rx.Observable.interval(1000));
+result.subscribe(x => console.log(x));
+```
+
+在每一次 click 動作重新執行 Observable.interval 的動作
+
+### switchMapTo
+
+就跟 `switchMap` 一樣，只是每次都回傳一樣的值
+
+![](images/switchMapTo.png)
+
+**使用介面**
+
+```typescript
+switchMapTo(innerObservable: ObservableInput, resultSelector: function(outerValue: T, innerValue: I, outerIndex: number, innerIndex: number): any): Observable
+```
+
+**使用範例**
+
+```typescript
+var clicks = Rx.Observable.fromEvent(document, 'click');
+var result = clicks.switchMapTo(Rx.Observable.interval(1000));
+result.subscribe(x => console.log(x));
+```
+
+### exhaustMap
+
+如果在上一個 Observable 動作未完成，又發生另一個 observable 動作，則這一個動作會被忽略。
+
+![](images/exhaustMap.png)
+
+**使用介面**
+
+```typescript
+exhaustMap(project: function(value: T, ?index: number): ObservableInput, resultSelector: function(outerValue: T, innerValue: I, outerIndex: number, innerIndex: number): any): Observable
+```
+
+**使用範例**
+
+```typescript
+var clicks = Rx.Observable.fromEvent(document, 'click');
+var result = clicks.exhaustMap(Rx.Observable.interval(1000));
+result.subscribe(x => console.log(x));
+```
+
+### expand
+
+![](images/expand.png)
+
+**使用介面**
+
+```typescript
+expand(project: function(value: T, index: number), concurrent: number, scheduler: Scheduler): Observable
+```
+
+**使用範例**
+
+```typescript
+Observable.of(1, 2)
+    .expand((value: number) => {
+      if (value === 8)
+        return Observable.empty();
+      else
+        return Observable.of(value * 2);
+    })
+    .subscribe(x => console.log(x)); // 輸出 1, 2, 4, 8, 2, 4, 8
+```
+
+### groupBy
+
+### mergeScan
+
+### pairwise
+
+### partition
+
+### pluck
+
+### scan
+
+### buffer
+
+### bufferCount
+
+### bufferTime
+
+### bufferToggle
+
+### bufferWhen
+
+### window
+
+### windowCount
+
+### windowCount
+
+### windowTime
+
+### windowToggle
+
+### windowWhen
 
 ## Filtering Operators
 
