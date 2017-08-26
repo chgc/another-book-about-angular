@@ -774,15 +774,184 @@ Observable.of(1, 2)
 
 ### groupBy
 
+根據條件將資料群組化輸出成獨立的 Observable
+
+![](images/groupBy.png)
+
+**使用介面**
+
+```typescript
+roupBy(keySelector: function(value: T): K, elementSelector: function(value: T): R, durationSelector: function(grouped: GroupedObservable<K, R>): Observable<any>): Observable<GroupedObservable<K, R>>
+```
+
+**使用範例**
+
+```typescript
+const data = [1, 2, 3, 4, 5];
+let groupData = [];
+Observable.from(data).groupBy(x => x % 2, (ele)=> ele + '!').subscribe(g => {
+  let group = {key: g.key, values: []};
+  g.subscribe(value => {
+    group.values.push(value);
+  });
+  groupData.push(group);
+});
+if (groupData) {
+  console.log(groupData); // 輸出: [{key: 1, values: [1!, 3!, 5!]}, {key: 2, values: [2!, 4!]}]
+}
+```
+
 ### mergeScan
+
+執行 scan 動作時，會回傳一個 observable 並與 outer observable 做 merge
+
+**使用介面**
+
+```typescript
+mergeScan(accumulator: function(acc: R, value: T): Observable<R>, seed: *, concurrent: number): Observable<R>
+```
+
+**使用範例**
+
+```typescript
+const data = [1, 2, 3, 4, 5];
+Observable.from(data)
+    .mergeScan((acc, one) => Observable.of(acc + one), 0)
+    .subscribe(value => console.log(value)); // 輸出: 1, 3, 6, 10, 15
+```
 
 ### pairwise
 
+將前一次與本次發生的資料合併輸出
+
+![](images/pairwise.png)
+
+**使用介面**
+
+```typescript
+pairwise(): Observable<Array<T>>
+```
+
+**使用範例**
+
+```typescript
+const data = [1, 2, 3, 4, 5];
+Observable.from(data)
+          .pairwise()
+          .subscribe(value => {
+  			console.log(value); // 輸出: [1,2], [2,3], [3,4], [4,5]
+          });
+```
+
 ### partition
+
+根據條件分成符合與不符合條件的兩組 Observable
+
+![](images/partition.png)
+
+**使用介面**
+
+```typescript
+partition(predicate: function(value: T, index: number): boolean, thisArg: any): [Observable<T>, Observable<T>]
+```
+
+**使用範例**
+
+```typescript
+const data = [1, 2, 3, 4, 5];
+let parts = Observable.from(data).partition(x => x % 2 === 1);
+parts[0].subscribe(value => {
+  console.log(value); // 輸出: 1, 3, 5
+});
+parts[1].subscribe(value => {
+  console.log(value); // 輸出: 2, 4
+});
+```
 
 ### pluck
 
+取出特定的屬性，可以透過第二，及第三引數等，取得更深層的屬性
+
+![](images/pluck.png)
+
+**使用介面**
+
+```typescript
+ pluck(properties: ...string): Observable
+```
+
+**使用範例**
+
+```typescript
+import 'rxjs';
+import {Observable} from 'rxjs/Observable';
+
+const data = [{name: 'a', sex: 1}, {name: 'b', sex: 1}, {name: 'c', sex: 0}]
+
+Observable.from(data)
+          .pluck('name')
+          .subscribe(value => console.log(value)); // 輸出: a, b, c
+```
+
+```typescript
+import 'rxjs';
+import {Observable} from 'rxjs/Observable';
+
+const data = [
+  {
+    id: 1,
+    company: {
+      name: 'Romaguera-Crona',
+      catchPhrase: 'Multi-layered client-server neural-net',
+      bs: 'harness real-time e-markets'
+    }
+  },
+  {
+    id: 2,
+    company: {
+      name: 'Deckow-Crist',
+      catchPhrase: 'Proactive didactic contingency',
+      bs: 'synergize scalable supply-chains'
+    }
+  },
+  {
+    id: 3,
+    company: {
+      name: 'Romaguera-Jacobson',
+      catchPhrase: 'Face to face bifurcated interface',
+      bs: 'e-enable strategic applications'
+    }
+  }
+];
+
+Observable.from(data)
+    .pluck('company', 'name')
+    .subscribe(value => {
+       console.log(value); // 輸出: Romaguera-Crona, Deckow-Crist, Romaguera-Jacobson
+    }); 
+```
+
 ### scan
+
+類似 JavaScript 的 reduce，但是會保留之前的狀態
+
+![](images/scan.png)
+
+**使用介面**
+
+```typescript
+scan(accumulator: function(acc: R, value: T, index: number): R, seed: T | R): Observable<R>
+```
+
+**使用範例**
+
+```typescript
+const subScan = new Subject();
+subScan.scan((acc: number, one: number) => acc + one, 0)
+    .subscribe(value => console.log(value));
+subScan.next(1); // 輸出: 1
+subScan.next(1); // 輸出: 2
+```
 
 ### buffer
 
@@ -827,4 +996,8 @@ Observable.of(1, 2)
 # Schedulers
 
 
+
+# 進階應用技巧
+
+## Observable.forEach
 
