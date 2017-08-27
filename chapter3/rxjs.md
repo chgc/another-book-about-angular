@@ -955,25 +955,255 @@ subScan.next(1); // 輸出: 2
 
 ### buffer
 
+根據 Observable 條件決定緩衝空間，當緩衝空間滿時，則輸出資料
+
+![](images/buffer.png)
+
+**使用介面**
+
+```typescript
+buffer(closingNotifier: Observable<any>): Observable<T[]>
+```
+
+**使用範例**
+
+```typescript
+Observable.interval(250)
+    .take(10)
+    .buffer(Observable.interval(1000))
+    .subscribe(value => console.log(value)); // 輸出：[0,1,2], [3,4,5,6]
+
+```
+
 ### bufferCount
+
+根據資料數量條件決定緩衝空間，當緩衝空間滿時，則輸出資料
+
+![](images/bufferCount.png)
+
+**使用介面**
+
+```typescript
+bufferCount(bufferSize: number, startBufferEvery: number): Observable<T[]>
+```
+
+**使用範例**
+
+```typescript
+Observable.interval(300)
+    .take(10)
+    .bufferCount(3)
+    .subscribe(value => console.log(value)); // 輸出: [0,1,2], [3,4,5],[6,7,8],[9]
+
+Observable.interval(300)
+    .take(10)
+    .bufferCount(3,2)
+    .subscribe(value => console.log(value)); // 輸出: [0,1,2], [2,3,4],[4,5,6],[6,7,8].[8,9]
+```
 
 ### bufferTime
 
+根據時間條件決定緩衝空間，當緩衝空間滿時，則輸出資料
+
+![](images/bufferTime.png)
+
+**使用介面**
+
+```typescript
+bufferTime(bufferTimeSpan: number, bufferCreationInterval: number, maxBufferSize: number, scheduler: Scheduler): Observable<T[]>
+```
+
+**使用範例**
+
+```typescript
+Observable.interval(300)
+    .take(10)
+    .bufferTime(1000)
+    .subscribe(value => console.log(value));
+```
+
 ### bufferToggle
+
+根據開始與結束開關決定緩衝空間，當緩衝空間滿時，則輸出資料
+
+![](images/bufferToggle.png)
+
+**使用介面**
+
+```typescript
+bufferToggle(openings: SubscribableOrPromise<O>, closingSelector: function(value: O): SubscribableOrPromise): Observable<T[]>
+```
+
+**使用範例**
+
+```typescript
+// 0123456789
+//    oc  oc
+Observable.interval(250)
+    .take(10)
+    .bufferToggle(Observable.interval(1000), x => Observable.interval(500))
+    .subscribe(value => console.log(value)); // 輸出： [3,4],[7,8]
+
+```
 
 ### bufferWhen
 
+根據結束開關決定緩衝空間，當緩衝空間滿時，則輸出資料
+
+![](images/bufferWhen.png)
+
+**使用介面**
+
+```typescript
+bufferWhen(closingSelector: function(): Observable): Observable<T[]>
+```
+
+**使用範例**
+
+```typescript
+Observable.interval(250)
+    .take(10)
+    .bufferWhen(() => Observable.interval(1000))
+    .subscribe(value => console.log(value)); // 輸出：[0,1,2],[3,4,5,6],[7,8,9]
+```
+
 ### window
 
-### windowCount
+根據 Observable 條件決定緩衝空間，當緩衝空間滿時，則輸出包含緩衝資料的新Observable
+
+![](images/window.png)
+
+**使用介面**
+
+```typescript
+window(windowBoundaries: Observable<any>): Observable<Observable<T>>
+```
+
+**使用範例**
+
+```typescript
+let i = 0;
+let groupsData = [];
+Observable.interval(250)
+    .take(10)
+    .window(Observable.interval(1000))
+    .subscribe(value => {
+      let group = {groupId: ++i, values: []};
+      value.forEach(v => group.values.push(v));
+      groupsData.push(group);      
+    });
+```
 
 ### windowCount
+
+根據資料數量條件決定緩衝空間，當緩衝空間滿時，輸出包含緩衝資料的新Observable
+
+![](images/windowCount.png)
+
+**使用介面**
+
+```typescript
+windowCount(windowSize: number, startWindowEvery: number): Observable<Observable<T>>
+```
+
+**使用範例**
+
+```typescript
+let i = 0;
+let groupsData = [];
+Observable.interval(250)
+    .take(10)
+    .windowCount(3)
+    .subscribe(value => {
+      let group = {groupId: ++i, values: []};
+      value.forEach(v => group.values.push(v));
+      groupsData.push(group);      
+    });
+```
+
+
 
 ### windowTime
 
+根據時間條件決定緩衝空間，當緩衝空間滿時，輸出包含緩衝資料的新Observable
+
+**使用介面**
+
+```typescript
+windowTime(bufferTimeSpan: number, bufferCreationInterval: number, maxBufferSize: number, scheduler: Scheduler): Observable<Observable<T>>
+```
+
+**使用範例**
+
+```typescript
+let i = 0;
+let groupsData = [];
+Observable.interval(250)
+    .take(10)
+    .windowTime(1000)
+    .subscribe(value => {
+      let group = {groupId: ++i, values: []};
+      value.forEach(v => group.values.push(v));
+      groupsData.push(group);
+      console.log(groupsData);
+    });
+```
+
 ### windowToggle
 
+根據開始與結束開關決定緩衝空間，當緩衝空間滿時，輸出包含緩衝資料的新Observable
+
+![](images/windowToggle.png)
+
+**使用介面**
+
+```typescript
+windowToggle(openings: Observable<O>, closingSelector: function(value: O): Observable): Observable<Observable<T>>
+```
+
+**使用範例**
+
+```typescript
+let i = 0;
+let groupsData = [];
+Observable.interval(250)
+    .take(10)
+    .windowToggle(Observable.interval(1000), x => Observable.interval(500))
+    .subscribe(value => {
+      let group = {groupId: ++i, values: []};
+      value.forEach(v => group.values.push(v));
+      groupsData.push(group);
+      console.log(groupsData);
+    });
+```
+
 ### windowWhen
+
+根據結束開關決定緩衝空間，當緩衝空間滿時，輸出包含緩衝資料的新Observable
+
+![](images/windowWhen.png)
+
+**使用介面**
+
+```typescript
+windowWhen(closingSelector: function(): Observable): Observable<Observable<T>>
+```
+
+**使用範例**
+
+```typescript
+let i = 0;
+let groupsData = [];
+Observable.interval(250)
+    .take(10)
+    .windowWhen(()=> Observable.interval(1000))
+    .subscribe(value => {
+      let group = {groupId: ++i, values: []};
+      value.forEach(v => group.values.push(v));
+      groupsData.push(group);
+      console.log(groupsData);
+    });
+```
 
 ## Filtering Operators
 
