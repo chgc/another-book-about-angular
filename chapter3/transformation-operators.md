@@ -396,7 +396,7 @@ Observable.from(data)
 
 ## scan
 
-類似 JavaScript 的 reduce，但是會保留之前的狀態
+類似 JavaScript 的 reduce，每次都會輸出計算後的值，且保留之前的狀態
 
 ![](images/scan.png)
 
