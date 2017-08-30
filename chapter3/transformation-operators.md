@@ -264,6 +264,45 @@ if (groupData) {
 }
 ```
 
+```typescript
+const data = [
+  {currency: 'USD', amount: 100}, {currency: 'NTD', amount: 100},
+  {currency: 'USD', amount: 150}, {currency: 'HKD', amount: 200}
+];
+
+function groupData() {
+  Observable.from(data)
+      .groupBy(x => x.currency)
+      .mergeMap(
+          group => group.reduce(
+              (acc, item) => {
+                acc.key = acc.key || group.key;
+                acc.items = [...acc.items, item];
+                return acc;
+              },
+              {key: '', items: []}))
+      .map(item => {
+        const total = item.items.reduce((acc, item) => acc + item.amount, 0);
+        return {key: item.key, items: item.items, total: total};
+      })
+      .toArray()
+      .subscribe(value => {
+        console.log(value);
+        /* 輸出結果      	
+        [ { key: 'USD', items: [{currency: 'USD', amount: 100}, 
+        						{currency: 'USD', amount: 150}], total: 250 },
+		  { key: 'NTD', items: [{currency: 'NTD', amount: 100}],total: 100 },
+          { key: 'HKD', items: [{currency: 'HKD', amount: 200}], total: 200 } ]
+        */
+      });
+}
+
+groupData();
+
+```
+
+
+
 ## mergeScan
 
 執行 scan 動作時，會回傳一個 observable 並與 outer observable 做 merge
