@@ -20,9 +20,9 @@
   * [Subject](chapter3/subject.md)
   * [Schedulers](chapter3/schedulers.md)
   * [進階應用技巧](chapter3/advance.md)
-* 架構
-  * [ngModules]()
-  * [Bootstrapping]()
+* Angular 概觀
+  * [架構](chapte4/architecture.md)
+  * [ngModules](chapter4/ng-modules.md)
 * [Component]()
 * [Directive]()
 * [Pipe]()
