@@ -1,4 +1,4 @@
-# Angular 架構概觀
+# Angular 架構
 
 Angular 是個 Framework ，使用 HTML 與 JavaScript ( TypeScript) 來建置 Client 端應用程式。
 
@@ -164,7 +164,7 @@ Angular 另外一個很重要的機制，就是 Dependency injection，Angular �
 
 在之後的章節，我們會更進一步的討論以下的區塊
 
-1. Modules
+1. [Modules](chapter4/ng-modules.md)
 2. Components
 3. Templates
 4. Metadata
