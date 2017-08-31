@@ -123,17 +123,98 @@ platformBrowserDynamic().bootstrapModule(AppModule);
 
 這裡所使用的 `AppModule` 就稱為啟動模組，也是所謂的根模組，當然更進階的啟動技巧，會在 bootstrapping  的章節討論，就目前為止，只需要知道 `@NgModule` 的 metadata 裡的 bootstrap 設定，只能存在於啟動模組裡。
 
+### entryComponents
+
+Angular 應用系統啟動 Component 的方式有兩種，一個是透過 `@NgModules.bootstraps` ，另外一種是使用 `entryComponents` 配合 `ngDoBootstrap` 函式內指定要啟動的 Component
+
+雖然這裡看似有兩種啟動方式，其實 `@NgModules.bootstraps` 底層也是將 bootstraps 的 components 註冊到 `entryComponents` 裡，之後在一一啟動所註冊的 components
+
+任何 component 是透過程式控制而載入的，都必須註冊到 `@NgModules.entryComponents` ，Component 註冊於`entryComponents` 與 `declartion` 的差異在於，Component 的程式碼是否有實際被產生出來，Angular 有一個 tree-shaking 的機制，這機制是在建制的過程中，分析哪些程式碼是有被使用，哪些程式碼沒有被使用，進而將沒有使用的程式碼給排除掉，這表示如果該 component 沒有被註冊到 entryComponents 內，或是沒有在任何 template 內被使用，該 component 就不會被編譯，所以為了最後的輸出檔案大小，要減少註冊於 entryComponents 的 component 數量
+
 ## Feature modules
 
-## Lazy-loading modules 
+即使應用程式規模不大，有機會遇到以下的問題
 
-## Shared modules
+1. 無法有系統管理功能元件
+2. directive 衝突
+3. 團隊開發時，很難指定工作職責
 
-## Core modules
+`Feature modules` 可以解決上述的問題，每一個 `Feature modules` 代表一個完整的功能或是一個完整的流程，各自獨立的，如果再搭配路由的延遲載入功能，連 providers 都可以與外界隔離，`Feature modules` 對外的窗口是 `export`，也可以透過 `forRoot` 來設定 `feature modules` 的 providers。
+
+Feature Modules 可以分為以下幾個大類
+
+| Feature Module | 描述                                       |
+| -------------- | ---------------------------------------- |
+| Domain         | Domain modules 負責 domain 行為，通常都會有一個當作 Module 的 root component 的 top component ，且只有 export  top component |
+| Routed         | Routed Module 屬 domain Module 的一種，這 Module 類別會跟路由綁在一起，常出沒在延遲載入路由設定時。通常也不會有 provider 的設定，因為延遲載入的關係，會局限 provide 只能在 Module 內部使用。 |
+| Routing        | Routing Module 提供路由設定檔給另外一個模組使用，優於管理路由設定檔，不會跟既有的 module 混淆在一起，尤其是當系統漸漸龐大時。 |
+| Service        | Service Module 如字面上的意思，提供功能服務，有別於 Widget Module 著重於 UI 的呈現，Service Module 注重於資料處理面，或是一些可重複使用的功能，例如說 `logging`。`HttpModule` 和 `CoreModule` 屬這一類別 |
+| Widget         | Widget Module 可以達到元件重複使用的功能，該元件的的功能很完整，可以獨立運作，例如許多第三套件都屬於這一類型的 module，如果是公司內部開發的系統，在相關系統的開發時，加減都會出現這類型的模組，以利於重複使用。`CommonModule` 和 `SharedModule` 屬這一類別 |
+
+在大概的整理一下各類別模組的特性
+
+| 特性      | declarations | providers | export        | import                    |
+| ------- | ------------ | --------- | ------------- | ------------------------- |
+| Domain  | Yes          | Rare      | Top Component | FeatureModule 和 AppModule |
+| Routed  | Yes          | Rare      | None          | None                      |
+| Routing | No           | Yes       | None          | AppModule                 |
+| Service | No           | Yes       | None          | AppModule                 |
+| Widget  | Yes          | Rare      | Yes           | Feature Modules           |
 
 
 
+### 我的 feature modules 應該 export 那些東西?
 
+Modules 的 `export` 的功能與 `public` 相同，當載入 feature modules 時，就是將該 modules 的 export 項目加到自己的註冊項目內。
 
+基於這個原理，只要是註冊於 declaration 及 imports 區塊的項目都可以 export，modules 即使沒有 import 也是可以 export 的，但 export modules 的部分需留意循環載入的問題。
 
+繼續延伸這個問題，什麼東西是不應該 export 的，
 
+1. 任何 component 、directive、pipe 只會在此 module 裡用到的
+2. 只會被動態載入的 components
+3. 註冊於 providers 內的 services、functions、configurations、和 entity models
+4. 沒有 export 內容的 modules，例如 `HttpModule`
+
+### 什麼是 forRoot  ?
+
+`forRoot` 是一個靜態方法，我們可以透過這個方法來設定 module 的 providers。有一個很好的使用案例，路由模組就會透過 `forRoot` 的方式，將路由設定檔設定到 `RouterModule` 裡，實做界面須參考 `ModuleWithProviders`
+
+```typescript
+const appRoutes: Routes = [
+  { path: 'crisis-center', component: CrisisListComponent },
+  { path: 'hero/:id',      component: HeroDetailComponent },
+  {
+    path: 'heroes',
+    component: HeroListComponent,
+    data: { title: 'Heroes List' }
+  },
+  { path: '',
+    redirectTo: '/heroes',
+    pathMatch: 'full'
+  },
+  { path: '**', component: PageNotFoundComponent }
+];
+
+@NgModule({
+  imports: [
+    RouterModule.forRoot(
+      appRoutes,
+      { enableTracing: true } // <-- debugging purposes only
+    )
+    // other imports here
+  ],
+  ...
+})
+export class AppModule { }
+```
+
+## SharedModule
+
+SharedModule 的主要功用，就是散撥歡樂散撥愛，任何 components、directives,、pipe 到處可以使用，放在 SharedModule 就是一個好地方，一些常用的 modules 也可以透過 re-export 的方式輸出，
+
+## CoreModule
+
+CoreModule 的功能是設定 providers ，而且全域只會有一份，任何地方都可以存取到同一個 services，所以為了維持這個功能，CoreModule 只能被 root AppModule 注入，CoreModule 可以透過 `forRoot` 的方式從外部傳參數進 module 後再將 module 建立出來 (工廠模式)。
+
+結論是 CoreModule 唯一的功能就是 service module，不會有任何 declarations。
