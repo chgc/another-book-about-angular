@@ -281,6 +281,98 @@ describe('VoteComponent', () => {
 
 # Forms
 
+Angular 表單有兩種機制，容易測試的是 Model Driven 的表單模式。
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+@Component({
+  selector: 'app-todo-form',
+  templateUrl: './todo-form.component.html',
+  styleUrls: ['./todo-form.component.css']
+})
+export class TodoFormComponent {
+  form: FormGroup;
+  constructor(fb: FormBuilder) {
+    this.form = fb.group({
+      name: ['', Validators.required],
+      email: ['']
+    });
+  }
+}
+
+```
+
+測試檔案
+
+```typescript
+import { FormBuilder } from '@angular/forms';
+import { TodoFormComponent } from './todo-form.component';
+
+describe('TodoFormComponent', () => {
+  let component: TodoFormComponent;
+
+  beforeEach(() => {
+    component = new TodoFormComponent(new FormBuilder());
+  });
+  ...
+});
+```
+
+在 beforeEach 區塊裡，因為 TodoFormComponent 需要一個 FormBuilder 的引數，這樣就可以完成建立 `TodoFormComponent` 了
+
+先來測試是否有成功建立兩個 controls
+
+```typescript
+ it('should create a form with 2 controls', () => {
+    expect(component.form.contains('name')).toBeTruthy();
+    expect(component.form.contains('email')).toBeTruthy();
+  });
+```
+
+另外一個需要測試的是，name control 為必填欄位的情境
+
+```typescript
+it('should make the name controls rquired', () => {
+    const control = component.form.get('name');
+    control.setValue('');
+    expect(control.valid).toBeFalsy();
+  });
+```
+
+這樣子就是簡單的表單測試了，這也是為什麼 Angular Team 說 ModelDriven 模式，程式很容易被測試的原因了
+
+# EventEmitter
+
+修正一下原本的 VoteComponent，多加上一個 voteChanged 的 EventEmitter，EventEmitter 通常搭配 `@Output` 一起使用
+
+```typescript
+export class VoteComponent {
+  totalVote = 0;
+  voteChanged = new EventEmitter();
+
+  upVote() {
+    this.totalVote++;
+    this.voteChanged.emit(this.totalVote);
+  }  
+}
+
+```
+
+因為 EventEmitter 是一個 Observable，所以必須使用 subscribe 才可以取得資料，測試案例如下
+
+```typescript
+  it('should raise voteChanged event when upvoted', () => {
+    let totalValue = null;
+    component.voteChanged.subscribe(value => {
+      totalValue = value;
+    });
+    component.upVote();
+    expect(totalValue).toEqual(1);
+  });
+```
+
 
 
 
