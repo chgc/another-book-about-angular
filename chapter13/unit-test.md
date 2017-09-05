@@ -373,13 +373,282 @@ export class VoteComponent {
   });
 ```
 
+# Spies
 
+spy 是另外一個很重要的手法，有時候一個 component 會注入其他的 services 去呼叫 API 或是邏輯計算，但是，services 會執行哪些事情並不是我們所在乎的，這時候就需要透過 spy 的手法來處理
 
+一個 TodosComponent 注入了一個 service，並透過 service 取得 todos 的清單
 
+```typescript
+import { Observable } from 'rxjs/Observable';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
+@Injectable()
+export class TodoService {
+  constructor(private http: HttpClient) {}
 
+  getTodos(): Observable<any[]> {
+    return this.http.get<any[]>('/todos');
+  }
+}
+```
 
+```typescript
+export class TodosComponent implements OnInit {
+  todos = [];
+  constructor(private todoService: TodoService) {}
 
+  ngOnInit() {
+    this.todoService.getTodos().subscribe(value => (this.todos = value));
+  }
+}
+
+```
+
+測試檔案
+
+```typescript
+
+describe('TodosComponent', () => {
+  let component: TodosComponent;
+  let service: TodoService;
+
+  beforeEach(() => {
+    service = new TodoService(null);
+    component = new TodosComponent(service);
+  });
+});
+```
+
+TodoService 傳入 null 是因為我不會也不希望去讀取真正的 API，所以 service 所需的 HttpClient 就不需要存在了
+
+```typescript
+it('should get todos item from the services', () => {
+  const todos = [1, 2, 3];
+  spyOn(service, 'getTodos').and.returnValue(Observable.of(todos));
+  component.ngOnInit();
+  expect(component.todos).toEqual(todos);
+});
+```
+
+spyOn 是 jasmine 提供的 spies API，主要功能是針對物件內的某函式，提供假資料給該函式回傳使用，當有使用到該函式時， spyOn 會攔截到並介入回傳所設定的回傳結果
+
+spyOn 還有其他使用方式
+
+```typescript
+spyOn(object, 'method').and.<spies method>
+```
+
+**Spies Methods**
+
+1. callThrough: 直接使用原本 object 的 method
+
+   ```typescript
+   describe("A spy, when configured to call through", function() {
+     var foo, bar, fetchedBar;
+
+     beforeEach(function() {
+       foo = {
+         setBar: function(value) {
+           bar = value;
+         },
+         getBar: function() {
+           return bar;
+         }
+       };
+
+       spyOn(foo, 'getBar').and.callThrough();
+
+       foo.setBar(123);
+       fetchedBar = foo.getBar();
+     });
+
+     it("tracks that the spy was called", function() {
+       expect(foo.getBar).toHaveBeenCalled();
+     });
+
+     it("should not affect other functions", function() {
+       expect(bar).toEqual(123);
+     });
+
+     it("when called returns the requested value", function() {
+       expect(fetchedBar).toEqual(123);
+     });
+   });
+   ```
+
+2. returnValue：回傳給予的值
+
+   ```typescript
+   describe("A spy, when configured to fake a return value", function() {
+     var foo, bar, fetchedBar;
+
+     beforeEach(function() {
+       foo = {
+         setBar: function(value) {
+           bar = value;
+         },
+         getBar: function() {
+           return bar;
+         }
+       };
+
+       spyOn(foo, "getBar").and.returnValue(745);
+
+       foo.setBar(123);
+       fetchedBar = foo.getBar();
+     });
+
+     it("tracks that the spy was called", function() {
+       expect(foo.getBar).toHaveBeenCalled();
+     });
+
+     it("should not affect other functions", function() {
+       expect(bar).toEqual(123);
+     });
+
+     it("when called returns the requested value", function() {
+       expect(fetchedBar).toEqual(745);
+     });
+   });
+   ```
+
+3. callFake：自訂一個新的函式內容來替代原本的函式
+
+   ```typescript
+   describe("A spy, when configured with an alternate implementation", function() {
+     var foo, bar, fetchedBar;
+
+     beforeEach(function() {
+       foo = {
+         setBar: function(value) {
+           bar = value;
+         },
+         getBar: function() {
+           return bar;
+         }
+       };
+       
+       spyOn(foo, "getBar").and.callFake(function(arguments, can, be, received) {
+         return 1001;
+       });
+
+       foo.setBar(123);
+       fetchedBar = foo.getBar();
+     });
+
+     it("tracks that the spy was called", function() {
+       expect(foo.getBar).toHaveBeenCalled();
+     });
+
+     it("should not affect other functions", function() {
+       expect(bar).toEqual(123);
+     });
+
+     it("when called returns the requested value", function() {
+       expect(fetchedBar).toEqual(1001);
+     });
+   });
+   ```
+
+4. throwError：回傳錯誤
+
+   ```typescript
+   describe("A spy, when configured to throw an error", function() {
+     var foo, bar;
+
+     beforeEach(function() {
+       foo = {
+         setBar: function(value) {
+           bar = value;
+         }
+       };
+
+       spyOn(foo, "setBar").and.throwError("quux");
+     });
+
+     it("throws the value", function() {
+       expect(function() {
+         foo.setBar(123)
+       }).toThrowError("quux");
+     });
+   });
+   ```
+
+Spy也可以用在 expect 內
+
+1. any: 判斷 object 的函式是否有被呼叫過
+
+   ```typescript
+    it('should get todos item from the services', () => {
+       const todos = [1, 2, 3];
+       const spy = spyOn(service, 'getTodos');
+       spy.and.returnValue(Observable.of(todos));
+
+       component.ngOnInit();
+       expect(spy.calls.any()).toBeTruthy();
+     });
+   ```
+
+2. count：判斷 object 的函式呼叫次數
+
+   ```typescript
+     it('should get todos item from the services', () => {
+       const todos = [1, 2, 3];
+       const spy = spyOn(service, 'getTodos');
+       spy.and.returnValue(Observable.of(todos));
+
+       component.ngOnInit();
+       expect(spy.calls.count()).toBe(1);
+     });
+   ```
+
+3. args：取得特定位置的引數
+
+   ```typescript
+    it("tracks the arguments of each call", function() {
+       foo.setBar(123);
+       foo.setBar(456, "baz");
+
+       expect(foo.setBar.calls.argsFor(0)).toEqual([123]);
+       expect(foo.setBar.calls.argsFor(1)).toEqual([456, "baz"]);
+     });
+   ```
+
+4. allArgs：取得所有引數
+
+   ```typescript
+     it("tracks the arguments of all calls", function() {
+       foo.setBar(123);
+       foo.setBar(456, "baz");
+
+       expect(foo.setBar.calls.allArgs()).toEqual([[123],[456, "baz"]]);
+     });
+   ```
+
+5. reset：清除所有追蹤狀態
+
+而 expect 其實也有相對應於 `spy.calls.any()` 與 `spy.calls.count()` 的判斷是，分別是 `toHaveBeenCalled()` 與 `toHaveBeenCalledTimes` ，用法很類似
+
+```typescript
+it('should get todos item from the services', () => {
+    const todos = [1, 2, 3];
+    const spy = spyOn(service, 'getTodos').and.returnValue(Observable.of(todos));
+
+    component.ngOnInit();
+    // calls.any()
+    expect(spy).toHaveBeenCalled();
+    // calls.count()
+    expect(spy).toHaveBeenCalledTimes(1);
+    // calls.allArgs()
+    expect(spy).toHaveBeenCalledWith();
+  });
+```
+
+# Limitation
+
+開發應用程式的過程中，單元測試佔整體的測試比例，大約是 70% 左右，雖然比例很高，還是有些限制是單元測試沒有辦法處理的，例如：Routers、Template bindings等，這些行為必須在 Angular 的環境下才能被測試，所以在下一個章節內，會來討論如何測試上述的情境
 
 
 
