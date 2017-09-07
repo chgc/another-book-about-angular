@@ -403,7 +403,9 @@ describe('HighlightDirective', () => {
 
 ## Asynchronous operations
 
-遇到 promise 的非同步行為時，又該怎麼測試呢?
+遇到 promise 的非同步行為時，又該怎麼測試呢? Angular 有兩種方式測試非同步行為
+
+這個是用來做測試範例的 component
 
 ```typescript
 import { Component } from '@angular/core';
@@ -427,7 +429,43 @@ export class QuoteComponent {
 }
 ```
 
-範例中的 `quoteService.getQuote()` 會傳一個 promise，這個 component 的測試檔案會是這樣
+### async + whenStable
+```typescript
+import { QuoteService } from './quote.service';
+import { QuoteComponent } from './quote.component';
+import { provide } from '@angular/core';
+import { async, TestBed, fakeAsync, tick } from '@angular/core/testing';
+
+class MockQuoteService {
+  public quote: string = 'Test quote';
+
+  getQuote() {
+    return Promise.resolve(this.quote);
+  }
+}
+
+describe('Testing Quote Component', () => {
+
+  let fixture;
+
+  beforeEach(() => {
+    ...
+  });
+
+  it('Should get quote', async(() => {
+    fixture.componentInstance.getQuote();    
+    fixture.detectChanges();
+    fixture.whenStable().then(()=>{
+      const compiled = fixture.debugElement.nativeElement;
+      expect(compiled.querySelector('div').innerText).toEqual('Test quote');
+    })
+  }));
+});
+```
+
+
+
+### fakeAsync + tick
 
 ```typescript
 import { QuoteService } from './quote.service';
