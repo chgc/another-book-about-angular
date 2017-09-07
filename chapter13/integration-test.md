@@ -319,17 +319,165 @@ it('should have a route-outlet tag', () => {
   });
 ```
 
+ 除了 `<router-outlet>` 外，也會有  `routerLink` 做頁面連結的入口，測試 `routerLink` 的方法有幾種，這裡用最簡單的方式作為範例，稍微複雜一點的是寫一個 `RouterLinkStubDirective` 來替換內建的 `RouterLinkDirective`
+
+```typescript
+  it('should have todos link', () => {
+    const de = fixture.debugElement.queryAll(By.directive(RouterLinkWithHref));
+    // <a routerLink="/todos">todos</a>
+    const idx = de.findIndex(
+      element => element.properties['href'] === '/todos'
+    );
+    expect(idx).toBeGreaterThan(-1);
+  });
+```
+
 
 
 ## Shallow component
+
+當一個 Component 內有使用到其他的 component 時，因為其他的 component 並不是我們所在乎的重點，所以在 TestingModule 內的 declarations 不應該註冊其他的 component，但是，這樣子會發生錯誤，Angular 會抱怨說有些 tag element 他看不懂，這時候就需要在 TestingModule 內加上 `schemas: [NO_ERRORS_SCHEMA]` 來避免錯誤訊息
+
+```typescript
+  beforeEach(
+    async(() => {
+      TestBed.configureTestingModule({
+        imports: [RouterTestingModule],
+        declarations: [AppComponent],
+        schemas: [NO_ERRORS_SCHEMA] // 重點
+      }).compileComponents();
+    })
+  );
+```
 
 
 
 ## Attribute directives
 
+測試 attribute directive 時，建立一個空的 host component 用來測試 directive 
 
+```typescript
+@Component({
+  selector: 'app-host-comp',
+  template: ''
+})
+class HostComponent {}
+
+describe('HighlightDirective', () => {
+  let fixture: ComponentFixture<HostComponent>;
+
+  beforeEach(
+    async(() => {
+      TestBed.configureTestingModule({
+        declarations: [HostComponent, HighlightDirective]
+      });
+    })
+  );
+
+  function createComponent() {
+    fixture = TestBed.createComponent(HostComponent);
+    fixture.detectChanges();
+  }
+
+  it('should highlight with cyan', () => {
+    TestBed.overrideComponent(HostComponent, {
+      set: { template: `<p highlight="cyan">empty</p>` }
+    });
+    createComponent();
+    const de = fixture.debugElement.query(By.css('p'));
+    expect(de.nativeElement.style.backgroundColor).toBe('cyan');
+  });
+
+  it('should highlight with yellow', () => {
+    TestBed.overrideComponent(HostComponent, {
+      set: { template: `<p highlight>empty</p>` }
+    });
+    createComponent();
+    const de = fixture.debugElement.query(By.css('p'));
+    expect(de.nativeElement.style.backgroundColor).toBe('yellow');
+  });
+});
+```
+
+利用 `overrideComponent` 的方法來改變 TestBed 內某 component template 的設定，利用這樣子的方式就可以測試 attribute directive 了
 
 ## Asynchronous operations
+
+遇到 promise 的非同步行為時，又該怎麼測試呢?
+
+```typescript
+import { Component } from '@angular/core';
+import { QuoteService } from './quote.service';
+
+@Component({
+  selector: 'my-quote',
+  template: '<h3>Random Quote</h3> <div>{{quote}}</div>'
+})
+
+export class QuoteComponent {
+  quote: string;
+
+  constructor(private quoteService: QuoteService){};
+
+  getQuote() {
+    this.quoteService.getQuote().then((quote) => {
+      this.quote = quote;
+    });
+  };
+}
+```
+
+範例中的 `quoteService.getQuote()` 會傳一個 promise，這個 component 的測試檔案會是這樣
+
+```typescript
+import { QuoteService } from './quote.service';
+import { QuoteComponent } from './quote.component';
+import { provide } from '@angular/core';
+import { async, TestBed, fakeAsync, tick } from '@angular/core/testing';
+
+class MockQuoteService {
+  public quote: string = 'Test quote';
+
+  getQuote() {
+    return Promise.resolve(this.quote);
+  }
+}
+
+describe('Testing Quote Component', () => {
+
+  let fixture;
+
+  beforeEach(() => {
+    ...
+  });
+
+  it('Should get quote', fakeAsync(() => {
+    fixture.componentInstance.getQuote();
+    tick();
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('div').innerText).toEqual('Test quote');
+  }));
+});
+```
+
+`fakeAsync` 搭配 `tick()` 方法使用，我們可以控制時間的變化，將非同步的行為轉換成同步行為進行測試。
+
+延伸測試應用，當我們有一個函式的功能是每分鐘會觸發一次動作，在測試的過程中，當然不可能等 1 分鐘後才知道測試結果，使用 `tick(ms)` 就可以讓時間快轉了
+
+```typescript
+describe('this test', () => {
+  it('looks async but is synchronous', <any>fakeAsync((): void => {
+       let flag = false;
+       setTimeout(() => { flag = true; }, 100);
+       expect(flag).toBe(false);
+       tick(50);
+       expect(flag).toBe(false);
+       tick(50);
+       expect(flag).toBe(true);
+     }));
+});
+```
 
 
 
