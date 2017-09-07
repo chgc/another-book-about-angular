@@ -139,21 +139,199 @@ it('should click upVote and totalValue is 1', () => {
 
 到這個階段，或許會有一個問題，這個跟直接觸發 `component.upVote()` 後在檢查 `totalVotes` 的結果有什麼差別呢? 整合測試是要確保 template 上的行為是可以正常執行的，有時候函式在單元測試內是測試成功的，但是 template 上會因為沒有正常實作而造成測試失敗，這也是單元測試與整合測試的差異了。
 
-## Providing the dependencies
+## Dependencies
 
-## Getting the dependencies
+### Providing the dependencies
 
-## providing stubs
+一個 Component 通常都會注入其他的 service，在測試時又該怎麼處理呢? 回想看看 `TestBed` 的功能是什麼，是設定一個測試用的 module，既然是 module，providers 和 imports 的動作就跟平常在設定 `@NgModules` 的方式是一模一樣的
 
-## Route parameters
+假設 TodosComponent 有注入 TodoService，TodoService 有注入 HttpClient 服務。
+
+```typescript
+export class TodosComponent implements OnInit {
+  todos = [];
+  constructor(private service: TodoService) {}
+  ...
+}
+```
+
+測試檔案的內容於 `beforeEach` 的區塊，加上 imports 與 providers 兩個區塊，並將所需要的 service 與 modules 設定進去
+
+```typescript
+...
+beforeEach(
+    async(() => {
+      TestBed.configureTestingModule({
+        imports: [HttpClientModule],
+        declarations: [TodosComponent],
+        providers: [TodoService]
+      }).compileComponents();
+    })
+  );
+...
+```
+
+當這樣子設定完成後，providing service 的部分就已經完成了
+
+### Getting the dependencies
+
+Angular 設定 provider 的地方有兩個，`@NgModule` 與 `@Component` 內都可以設定 providers，因為設定位置的不一樣，所以取得的方式也會有所不同
+
+如果 service 是設定在 `@NgModule` 內時，取得 service 的方式如下
+
+```typescript
+const service = TestBed.get(TodoService);
+```
+
+如果 service 是設定在 `@Component` 內時，取得 service 的方式如下
+
+```typescript
+const service = fixture.debugElement.injector.get(TodoService);
+```
+
+在整合測試時，我們還是不希望依賴外部引用的 service ，這裡的處理方式會跟單元測試的方式一樣，透過 `spyOn` 的方式控制 service 的行為
+
+### providing stubs
+
+有時候 component 所使用的 service 會遇到測試困難，例如路由。有時為了簡化測試的複雜度，會使用 `stubs` 的手法簡化，與其使用真的 service，不如自己建立一個簡單又符合目前所需的 service class 即可，也感謝 Angular 的 DI 機制，讓這一切變簡單了
+
+```typescript
+export class TodosComponent implements OnInit {
+  constructor(private router: Router, private route: ActivatedRoute) {}
+
+  ngOnInit() {
+     this.route.params.subscribe(params => {
+      if (params['id'] === 0) {
+        this.router.navigate(['not-found']);
+      }
+    });
+  }
+
+  save() {
+    this.router.navigate(['/dash']);
+  }
+}
+
+```
+
+Router 本身的功能很複雜，要測試的項目又很多，所以簡化的方式就是建立一個 RouterStub class 替換真的 Router
+
+```typescript
+class RouterStub {
+  navigate(params) {}
+}
+
+class ActivatedRouteStub {
+  params: Observable<any> = Observable.empty();
+}
+...
+beforeEach(
+  async(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientModule],
+      declarations: [TodosComponent],
+ 	  providers: [          
+          { provide: Router, useClass: RouterStub },
+          { provide: ActivatedRoute, useClass: ActivatedRouteStub }
+        ]
+    }).compileComponents();
+  })
+);
+```
+
+這樣子的手法就可以大大的簡化測試的難度，這手法適用於其他第三方套件情境
+
+## Route
+
+### Navigation
+
+由於在上一小節將 Router 與 ActivatedRoute 都用假的 class 替換掉了，所以這裡的測試就變簡單了
+
+測試當某動作完成後，是否有正確的呼叫 router.navigate 函式，可以使用 `toHaveBeenCalledWith` 的方法來檢查
+
+```typescript
+ it('should redirect user to dash page', () => {
+    const router = TestBed.get(Router);
+    const spy = spyOn(router, 'navigate');
+
+    component.save();
+    // this.router.navigate(['dash']); 
+    // 測試傳入引數是否正確
+    expect(spy).toHaveBeenCalledWith(['dash']);
+  });
+```
+
+### Parameters
+
+測試路由參數的方式跟測試路由轉換的方式很類似，但還是要稍微修改一下 ActiveatedRouteStub 的內容，我們必須建立一個方法可以讓外部使用者將要設定路由參數傳入，修改如下
+
+```typescript
+class ActivatedRouteStub {
+  private subject = new Subject();
+  get params() {
+    return this.subject.asObservable();
+  }
+
+  push(value) {
+    this.subject.next(value);
+  }
+}
+```
+
+透過 RxJS Subject 的特性，可以很簡單的完成這個 `params.subscribe` 的功能，接下來就是測試在 `ngOnInit` 內的功能是否正常
+
+```typescript
+ngOnInit() {
+  this.route.params.subscribe(params => {
+    if (params['id'] === 0) {
+      this.router.navigate(['not-found']);
+    }
+  });
+}
+```
+
+當路由參數  id 是 0 時，會轉址到 `not-found` 的頁面
+
+```typescript
+it('should redirect user to NotFound page', () => {
+    const router = TestBed.get(Router);
+    const spy = spyOn(router, 'navigate');
+
+    const route: ActivatedRouteStub = TestBed.get(ActivatedRoute);
+    route.push({ id: 0 });
+
+    expect(spy).toHaveBeenCalledWith(['not-found']);
+});
+```
+
+
 
 ## RouterOutlet components
 
+`<router-outlet></router-outlet>` 是搭配路由設定顯示 Component 的標籤，一但沒有這個就無法正常地顯示 component 內容，那要怎麼確保這個標籤不會被誤刪呢? 就是寫個測試來保護他
+
+```typescript
+import { RouterOutlet } from '@angular/router';
+...  
+it('should have a route-outlet tag', () => {
+    const de = fixture.debugElement.query(By.directive(RouterOutlet));
+    expect(de).not.toBeNull();
+  });
+```
+
+
+
 ## Shallow component
+
+
 
 ## Attribute directives
 
+
+
 ## Asynchronous operations
+
+
 
 
 
