@@ -154,15 +154,3 @@ class HttpParams {
 
 
 
-# 進階技巧
-
-## interceptor
-
-## progress events
-
-
-
-# 安全性
-
-
-
