@@ -2,9 +2,9 @@
 
 ## Interceptor
 
-`Interceptor` 是 `@angular/common/http` 內一個很重要的功能，這功能讓我們可以在後端間建立一個關卡，用來監控或加工進出的邀請與回應
+`Interceptor` 是 `@angular/common/http` 內一個很重要的功能，這功能可以讓我們在後端間建立一個關卡，用來監控或加工 request 與  response
 
-一個基本的寫法如下
+一個基本 interceptor 架構如下
 
 ```typescript
 import {Injectable} from '@angular/core';
@@ -18,7 +18,7 @@ export class NoopInterceptor implements HttpInterceptor {
 }
 ```
 
-然後當一個 Interceptor 完成後，在註冊到 `@NgModules`裡
+ Interceptor 需註冊到 `@NgModules`裡， 這裡有使用 multi，這表示我們可以寫多個 Interceptor ，套用順序會依註冊的順序
 
 ```typescript
 import {NgModule} from '@angular/core';
@@ -34,9 +34,18 @@ import {HTTP_INTERCEPTORS} from '@angular/common/http';
 export class AppModule {}
 ```
 
+
+* HttpHandler.handle：接受 `HttpRequest` 為引數，回傳結果可以視為 Response
+
+```typescript
+  class HttpHandler {
+    handle(req: HttpRequest<any>): Observable<HttpEvent<any>>
+  }
+```
+
 * HttpRequest： An outgoing HTTP request with an optional typed body. Immutable 物件
 
-  ```typescript
+```typescript
   class HttpRequest<T> {
     constructor(method: string, url: string, third?: T|{...}, fourth?: {...})
     body: T|null
@@ -52,31 +61,16 @@ export class AppModule {}
     detectContentTypeHeader(): string|null
     clone(update: {...}): HttpRequest<any>
   }
-  ```
-
-* HttpHandler.handle：接受 `HttpRequest` 為引數，回傳結果可以視為 Response
-
-  ```typescript
-  class HttpHandler {
-    handle(req: HttpRequest<any>): Observable<HttpEvent<any>>
-  }
-  ```
+```
 
 * HttpEvent：一個型別代表以下的狀態
 
-  ```typescript
+```typescript
   type HttpEvent = HttpSentEvent | HttpHeaderResponse | HttpResponse<T>| HttpProgressEvent | HttpUserEvent<T>;
-  ```
+```
 
 
-
-### 順序
-
-由於在註冊於 `@NgModules` 時有使用 multi，這表示我們可以寫多個 ineterceptor，套用的順序會依註冊的順序
-
-
-
-### Immutable
+### Immutable 特性
 
 `HttpRequest` 與 `HttpResponse` 都是 immutable 物件，所以必須透過內建的方法用來改變值，每一個方法都會回傳一個新的物件，以下為改變 HttpRequest header 的範例程式
 
