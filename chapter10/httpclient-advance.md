@@ -4,7 +4,7 @@
 
 `Interceptor` 是 `@angular/common/http` 內一個很重要的功能，這功能可以讓我們在後端間建立一個關卡，用來監控或加工 request 與  response
 
-一個基本 interceptor 架構如下
+基本 interceptor 架構如下
 
 ```typescript
 import {Injectable} from '@angular/core';
@@ -72,7 +72,7 @@ export class AppModule {}
 
 ### Immutable 特性
 
-`HttpRequest` 與 `HttpResponse` 都是 immutable 物件，所以必須透過內建的方法用來改變值，每一個方法都會回傳一個新的物件，以下為改變 HttpRequest header 的範例程式
+`HttpRequest`是 immutable 物件，所以必須透過內建的方法 `clone()` 用來改變值並會回傳一個新的 HttpRequest，以下為改變 HttpRequest header 的範例程式
 
 ```typescript
 import {Injectable} from '@angular/core';
@@ -91,9 +91,9 @@ export class AuthInterceptor implements HttpInterceptor {
 }
 ```
 
+可修改的內容，請參閱上述的 HttpRequest Class
 
-
-### 範例
+### 使用範例
 
 #### Logging
 
@@ -116,6 +116,8 @@ export class TimingInterceptor implements HttpInterceptor {
   }
 }
 ```
+
+
 
 #### Caching
 
@@ -166,9 +168,49 @@ export class CachingInterceptor implements HttpInterceptor {
 }
 ```
 
+#### Authentication
+
+```typescript
+@Injectable()
+export class TokenInterceptor implements HttpInterceptor {
+  constructor(public auth: AuthService) {}
+  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    // 每一個 Http Request 都會加上 Token 資訊
+    request = request.clone({
+      setHeaders: {
+        Authorization: `Bearer ${this.auth.getToken()}`
+      }
+    });
+    return next.handle(request);
+  }
+}
+```
+
+```typescript
+export class JwtInterceptor implements HttpInterceptor {
+  constructor(public auth: AuthService) {}
+  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    
+    return next.handle(req).do((event: HttpEvent<any>) => {
+      if (event instanceof HttpResponse) {
+       
+      }
+    }, (err: any) => {
+      if (err instanceof HttpErrorResponse) {
+        if (err.status === 401) {
+          // 處理未授權時應有的後續動作
+        }
+      }
+    });
+  }
+}
+```
+
 
 
 ## Progress events
+
+如何簡單又快速的做到上傳檔案進度監控的動作呢? 以前需要自己實作 XHR ，現在直接使用  HttpClient.request 就可以了，方法如下
 
 ```typescript
 const req = new HttpRequest('POST', '/upload/file', file, {
@@ -176,17 +218,44 @@ const req = new HttpRequest('POST', '/upload/file', file, {
 });
 ```
 
+`HttpRequest` 的 constructor 接受這些參數
+
+```typescript
+constructor(method: string, url: string, 
+            third?: T|{
+        		headers?: HttpHeaders,
+        		reportProgress?: boolean,
+        		params?: HttpParams,
+        		responseType?: 'arraybuffer'|'blob'|'json'|'text',
+        		withCredentials?: boolean,
+        	} |null, 
+        	fourth?: {
+	        	headers?: HttpHeaders,
+    	    	reportProgress?: boolean,
+        		params?: HttpParams,
+        		responseType?: 'arraybuffer'|'blob'|'json'|'text',
+        		withCredentials?: boolean,
+      		})
+```
+
+當建立完要送出的 HttpRequest  物件後，可透過 `httpClient.request` 的方法去執行，並取得 HttpResponse 的結果回來，這裡的模式很類似於 interceptor 的運作模式
+
 ```typescript
 http.request(req).subscribe(event => {
   // Via this API, you get access to the raw event stream.
   // Look for upload progress events.
-  if (event.type === HttpEventType.UploadProgress) {
-    // This is an upload progress event. Compute and show the % done:
-    const percentDone = Math.round(100 * event.loaded / event.total);
-    console.log(`File is ${percentDone}% uploaded.`);
-  } else if (event instanceof HttpResponse) {
-    console.log('File is completely uploaded!');
-  }
+   if (event.type === HttpEventType.DownloadProgress) {
+     console.log("Download progress event", event);
+   }
+   if (event.type === HttpEventType.UploadProgress) {
+     console.log("Upload progress event", event);
+     // This is an upload progress event. Compute and show the % done:
+     const percentDone = Math.round(100 * event.loaded / event.total);
+     console.log(`File is ${percentDone}% uploaded.`);
+   }
+   if (event.type === HttpEventType.Response) {
+     console.log("response received...", event.body);
+   }  
 });
 ```
 
