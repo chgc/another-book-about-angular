@@ -170,6 +170,8 @@ export class CachingInterceptor implements HttpInterceptor {
 
 #### Authentication
 
+在每一次 Request 時，在 Header 新增 Authorization 內容供後端驗證使用，當接受到回應時，在判斷回傳狀態並給予相對應的動作
+
 ```typescript
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor {
@@ -204,6 +206,37 @@ export class JwtInterceptor implements HttpInterceptor {
     });
   }
 }
+```
+
+#### Server Side Rendering
+
+這一個 interceptor 允許 HttpRequest 回傳的結果也能做到 SSR 的效果
+
+```typescript
+import { Injectable, Inject, Optional } from '@angular/core';
+import { HttpInterceptor, HttpHandler, HttpRequest } from '@angular/common/http';
+import { ORIGIN_URL } from '@nguniversal/aspnetcore-engine';
+
+@Injectable()
+export class UniversalInterceptor implements HttpInterceptor {
+  constructor(
+    @Optional()
+    @Inject(ORIGIN_URL)
+    private serverUrl
+  ) {}
+
+  intercept(req: HttpRequest<any>, next: HttpHandler) {
+    console.log(this.serverUrl);
+    const serverReq = !this.serverUrl
+      ? req
+      : req.clone({
+          url: `${this.serverUrl}${req.url}`
+        });
+
+    return next.handle(serverReq);
+  }
+}
+
 ```
 
 
@@ -258,6 +291,47 @@ http.request(req).subscribe(event => {
    }  
 });
 ```
+
+## 安全性
+
+Cross-Site Request Forgery (XSRF) Protection 是一種挾制用戶在當前已登錄的Web應用程式上執行非本意的操作的攻擊方法，跟跨網站指令碼（XSS）相比，XSS 利用的是用戶對指定網站的信任，CSRF/XSRF 利用的是網站對用戶網頁瀏覽器的信任。
+
+HttpClient 提供最基本的 `Cookie-to-Header Token` 的模式來防止 XSRF 攻擊，當發出 Http Request 時，HttpClient 會從 cookie 內讀取 `XSRF-TOKEN` 資訊並新增 `X-XSRF-TOKEN` 到 Http Header 內，但以下的行為不會被新增 token 資訊
+
+1. GET/HEAD 請求
+2. 使用絕對網址的請求，例如 `https://www.apiwebsite.com/api/posts` 
+
+而後端伺服器如果要善用這 XSRF 的保護機制，就需要傳出 `XSRF-TOKEN` 名稱的 cookie 或是 session，當然這是預設的名稱，也是修改成不同的名稱。或是可以修改驗證的 Header 名稱，這時就需透過 `HttpClientXsrfModule` 來設定相關的名稱
+
+```typescript
+imports: [
+  HttpClientModule,
+  HttpClientXsrfModule.withConfig({
+    cookieName: 'My-Xsrf-Cookie',
+    headerName: 'My-Xsrf-Header',
+  }),
+]
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
