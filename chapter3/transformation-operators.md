@@ -301,6 +301,20 @@ groupData();
 
 ```
 
+```typescript
+// 使用多個 groupBy key 值的寫法
+const people = [{ name: 'Sue', age: 25 }, { name: 'Sue', age: 25 }, { name: 'Joe', age: 30 }, { name: 'Sarah', age: 35 }];
+const source = Observable.from(people);
+const example = source
+    .groupBy(p => JSON.stringify({ age: p.age, name: p.name }))
+    .flatMap(group => group.reduce((acc, curr) => [...acc, curr], []));
+const subscribe = example.subscribe(val => console.log(val));
+
+// [ { name: 'Sue', age: 25 }, { name: 'Sue', age: 25 } ]
+// [ { name: 'Joe', age: 30 } ]
+// [ { name: 'Sarah', age: 35 } ]
+```
+
 
 
 ## mergeScan
