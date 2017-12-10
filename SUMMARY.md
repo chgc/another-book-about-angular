@@ -21,20 +21,20 @@
   * [Schedulers](chapter3/schedulers.md)
   * [進階應用技巧](chapter3/advance.md)
 * Angular 概觀
-  * [架構](chapte4/architecture.md)
+  * [架構](chapter4/architecture.md)
   * [ngModules](chapter4/ng-modules.md)
-* [Component]()
-* [Directive]()
-* [Pipe]()
-* [路由 Routing]()
-* [表單 Form]()
-* [HttpClient](chatper10/README.md)
-* [DI 機制]()
-  * [Service]()
-* [動畫 Animations]()
-* [測試](chpater13/README.md)
-* [應用範例]()
-  * [ngrx]()
-  * [i18n]()
-  * [PWA]()
+* Component
+* Directive
+* Pipe
+* 路由 Routing
+* 表單 Form(進行中)
+* [HttpClient](chapter10/README.md)
+* DI 機制
+  * Service
+* 動畫 Animations
+* [測試](chapter13/README.md)
+* 應用範例
+  * ngrx
+  * i18n
+  * PWA
 
