@@ -162,7 +162,7 @@ export class ForbiddenValidatorDirective implements Validator {
 
 
 
-## 總結
+## 小結
 
 Template-Driven Form 是一個可以快速開發表單的方式，但是遇到表單比較複雜，或是需要動態調整表單內容時，Template-Driven 的開發方式就會感到有點吃力，或是在維護上比較困難了。
 
