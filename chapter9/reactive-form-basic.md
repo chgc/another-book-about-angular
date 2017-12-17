@@ -128,98 +128,67 @@ export class DemoComponent {
 
 - FormGroup: 容器，用來包 FormControl、FormArray
 
-- - contructor(value, validatorOrOpts)
+  - contructor(value, validatorOrOpts)
 
-  - - 可設定值，驗證，及 updateOn 選項
+    - 可設定值，驗證，及 updateOn 選項
 
   - Control 的控制
 
-  - - registerControl vs addControl
+    - registerControl vs addControl
+    - registerControl 註冊 Control 到 Group 內並回傳 Control實體，而且不會觸發 valueChanges跟 validation
+    - addControl 新增 Control 到  Group 內，不會回傳東西而且會觸發 valueChanges跟 validation
 
-    - - registerControl 註冊 Control 到 Group 內並回傳 Control實體，而且不會觸發 valueChanges跟 validation
-      - addControl 新增 Control 到  Group 內，不會回傳東西而且會觸發 valueChanges跟 validation
 
     - controls: FormGroups 下的 control 陣列清單
-
     - removeControl ： 移除 control
-
     - setControl: 替換 control
-
     - `contains` VS  `get`
-
-    - - contains:  檢查 control 是否為 enabled
+      - contains:  檢查 control 是否為 enabled
       - get: 從 FormGroup 內取得 control，不限定狀態
-
     - setValue vs patchValue
-
-    - - setValue 會替換整個 FormGroup 內 controls 的值，所以要 setValue 的物件必須與 FormGroup 相符
-
+      - setValue 會替換整個 FormGroup 內 controls 的值，所以要 setValue 的物件必須與 FormGroup 相符
       - patchValue 可以設定 FormGroup 內部分 controls 的值，patchValue 傳入的物件欄位數量不一定要和 FormGroup 相符
-
       - options: {onlySelf?: boolean, emitEvent?: boolean}
-
-      - - onlySelf: 只會觸發自身的 Validation
+        - onlySelf: 只會觸發自身的 Validation
         - emitEvent: 是否會觸發 valueChanges 事件
-
     - reset: 重置 FormGroup 值與狀態
 
   - value vs getRawValue()
 
-  - - value: 只取出非 disabled 的 control 資料
+    - value: 只取出非 disabled 的 control 資料
     - getRawValue(): 取得 FormGroup 內所有 control 的資料
 
   - updateValueAndValidity(): 重新觸發驗證
 
   - get(<path>) 取得 Group內的 control
 
-  - - 如果有sub group 裡的 control 時，可以這樣子使用 get(‘subgroup.controlName’) 或是 get([‘subgroup’, ‘controlName’]) 取得 control
+    - 如果有sub group 裡的 control 時，可以這樣子使用 get(‘subgroup.controlName’) 或是 get([‘subgroup’, ‘controlName’]) 取得 control
 
 
 - FormControl: 
-
-- - 設定初始值及狀態
-
-  - - new FormControl(value)
-
+  - 設定初始值及狀態
+    - new FormControl(value)
     - new FormControl({value: ’123’, disabled: true})
-
-    - - control.value; // 123
+      - control.value; // 123
       - control.status // disabled
-
     - new FormControl(‘’, Validators.required)
-
-    - - control.value; // <空白>
+      - control.value; // <空白>
       - control.status // invalid
-
     - new FormControl(‘’, {  validators: [Validators](https://angular.io/api/forms/Validators).required,  asyncValidators: myAsyncValidator, updateOn: ‘blur’ })
-
   - setValue vs patchValue 的行為同 FormGroup
-
-  - - emitModelToViewChange: 是否觸發 onChange 事件 (預設值: true)
+    - emitModelToViewChange: 是否觸發 onChange 事件 (預設值: true)
     - emitViewToModelChange: 是否觸發 ngModelChange 事件 (預設值: true)
-
   - registerOnChange(fn): 註冊一個 callback 到 FormControl 的 change 事件 (自訂 FormControl 用)
-
   - registerOnDisabledChange(fn): 註冊一個callback 到 FormControl disabled events (自訂 FormControl 用)
-
   - 錯誤處理
-
-  - - setError
-
-    - - 手動設定錯誤訊息
-
-      - - setError({‘myError’: true}) 
-
+    - setError
+      - 手動設定錯誤訊息
+        - setError({‘myError’: true}) 
       - 清除錯誤訊息
-
-      - - setError(null)
-
+        - setError(null)
     - hasError
-
-    - - hasError(‘myError’)
-
+      - hasError(‘myError’)
     - getError: boole
-
   - enabled(opts?) & disabled(opts?)
 
     - opts: {
@@ -231,10 +200,8 @@ export class DemoComponent {
 
 
 - FormArray:  陣列用來裝 FormGroup/ FormControl
-
-- - 基本操作
-
-  - - push: 新增 control 到最後面
+  - 基本操作
+    - push: 新增 control 到最後面
     - insert: 新增 control 至特定位置
     - removeAt: 移除 control
     - length: 取得目前有的 control 數量
