@@ -160,23 +160,3 @@ Angular 另外一個很重要的機制，就是 Dependency injection，Angular �
 
 
 
-# Wrap up
-
-在之後的章節，我們會更進一步的討論以下的區塊
-
-1. [Modules](chapter4/ng-modules.md)
-2. Components
-3. Templates
-4. Metadata
-5. Data Binding
-6. Directives
-7. Services
-8. Dependency injection
-9. Animations
-10. Forms
-11. HTTP
-12. Lifecycle hooks
-13. Pipes
-14. Router
-15. Testing
-
