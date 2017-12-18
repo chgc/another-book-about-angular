@@ -29,7 +29,7 @@
 * 路由 Routing
 * [表單 Form](chapter9/README.md)
 * [HttpClient](chapter10/README.md)
-* DI 機制
+* [DI 機制](chapter11/README.md)
   * Service
 * 動畫 Animations
 * [測試](chapter13/README.md)
