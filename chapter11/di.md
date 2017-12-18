@@ -1,6 +1,147 @@
 # Angular Dependency Injection
 
-Angular 有內建一套 Dependency Injection 框架，可以讓我們簡單的完成 DI 的相關行為
+Angular 有內建一套 Dependency Injection 框架，可以讓我們簡單的完成 DI 的相關行為，以下簡單說明如何註冊並使用
+
+# 註冊 providers 
+
+我們可以在 `NgModule` 與 `Component` 這兩個地方註冊 providers，
+
+```typescript
+@NgModule({
+  imports: [
+    BrowserModule
+  ],
+  declarations: [
+   ...
+  ],
+  providers: [
+    UserService, // 註冊 provider
+    { provide: APP_CONFIG, useValue: HERO_DI_CONFIG }
+  ],
+  bootstrap: [ AppComponent ]
+})
+export class AppModule { }
+```
+
+```typescript
+import { Component }          from '@angular/core';
+
+import { HeroService }        from './hero.service';
+
+@Component({
+  selector: 'my-heroes',
+  providers: [HeroService], // 註冊 provider
+  ...
+})
+export class HeroesComponent { }
+```
+
+而註冊這這兩個地方的差異性是影響的層級，如果 provider 是註冊在 `NgModule` 時，是註冊在 Application 層級或是 Module 層級，在該層級下的所有人都可以使用到同一個 provider，註冊在 `Component` 時，只能在該 component 及向下的子 component 可以使用而已。所以可依據該 provider 的使用群組來決定要註冊在哪一個地方
+
+註冊 provider 的方式有很多種，但是在這之前，必須提到 `@Injectable` 這個 decorator，任何需要被註冊到 provider 裡的 service 都必須掛有 `@Injectable` ，不然 Injector 會報錯誤，雖然這表示不需註冊至 provider 內的 service 不需要標示為 `@Injectable`，但官網建議為了一致性，還是將其 decorator 標上。
+
+
+
+## 註冊方法
+
+Angular Provider 的註冊方式有以下幾種
+
+1. shorthand 表示法：直接將 service 註冊到 providers 內
+
+   ```typescript
+   providers: [Logger]
+   ```
+
+   這種註冊式方式等同於下一個的寫法
+
+2. useClass : 會建立一個新的 instance
+
+   ```typescript
+   providers:[
+       {provide: Logger, useClass: Logger}
+   ]
+   ```
+
+3. useExist：使用已存在的 provider，有使用別名的效果
+
+   ```typescript
+   providers:[
+       Logger,
+       {provide: myLogger, useExist: Logger}
+   ]
+   ```
+
+4. useValue：單純的想提供值而非一個 class 時，就可以使用 useValue 的方式註冊，建議搭配 InjectionToken 一起使用
+
+   ```typescript
+   import { InjectionToken } from '@angular/core';
+
+   export let APP_CONFIG = new InjectionToken<AppConfig>('app.config');
+   ...
+   providers: [{ provide: APP_CONFIG, useValue: HERO_DI_CONFIG }]
+   ```
+
+5. useFactory：利用工廠模式來建立 Class 實體
+
+   ```typescript
+   let heroServiceFactory = (logger: Logger, userService: UserService) => {
+     return new HeroService(logger, userService.user.isAuthorized);
+   };
+   ...
+   providers:[
+       { provide: HeroService,
+         useFactory: heroServiceFactory,
+         deps: [Logger, UserService]
+       }
+   ]  
+   ```
+
+   **deps** 提供 FacotryClass 所需的 dependence class
+
+
+
+# 使用 providers
+
+當完成註冊 providers 後，要如何使用已註冊的 provider 呢? 以 component 為例，將要使用的 provider 列在 constructor 內，Angular 在 compiler 時就會進行分析並將設定的 provider 提供給 Component 使用
+
+可以透過以下的三種方式
+
+1. 直接使用 provider type 
+
+```typescript
+export class HeroListComponent {
+  heroes: Hero[];
+ 
+  constructor(heroService: HeroService) {
+    this.heroes = heroService.getHeroes();
+  }
+}
+```
+
+2. 使用 Injector
+
+```typescript
+  constructor(private injector: Injector) {
+    heroService = this.injector.get(HeroService);
+    this.heroes = heroService.getHeroes();
+  }
+```
+
+3. `@Inject`
+
+註冊 providers 時，有時候會使用 `useValue` 的方式註冊 Value 至 provider 內，這時需透過 `@Inject()` 的方式取得所註冊的值
+
+```typescript
+import { InjectionToken } from '@angular/core';
+
+export let APP_CONFIG = new InjectionToken<AppConfig>('app.config');
+providers: [{ provide: APP_CONFIG, useValue: HERO_DI_CONFIG }]
+
+// component
+constructor(@Inject(APP_CONFIG) config: AppConfig) {
+  this.title = config.title;
+}
+```
 
 
 
@@ -207,13 +348,13 @@ function recursivelyProcessProviders(records: Map<any, Record>, provider: Static
 
 到這裡，已經可以看出 Inector 的運作模式，但到這個階段也同時建立 Application-Wild 層級的 Injector，預設在 platform 層級所註冊的 provider 有下列幾項
 
-1.  {provide: ResourceLoader, useClass: CachedResourceLoader, deps: []}
-2.  {provide: COMPILER_OPTIONS, useValue: {}, multi: true}
-3.  **{provide: CompilerFactory, useClass: JitCompilerFactory, deps: [COMPILER_OPTIONS]}**
-4.  {provide: PLATFORM_ID, useValue: 'unknown'}
-5.  **{provide: PlatformRef, deps: [Injector]}** 
-6.  {provide: TestabilityRegistry, deps: []}
-7.  {provide: Console, deps: []}
+1. {provide: ResourceLoader, useClass: CachedResourceLoader, deps: []}
+2. {provide: COMPILER_OPTIONS, useValue: {}, multi: true}
+3. **{provide: CompilerFactory, useClass: JitCompilerFactory, deps: [COMPILER_OPTIONS]}**
+4. {provide: PLATFORM_ID, useValue: 'unknown'}
+5. **{provide: PlatformRef, deps: [Injector]}** 
+6. {provide: TestabilityRegistry, deps: []}
+7. {provide: Console, deps: []}
 
 之前有提過 Injector.create 除了測試檔案外，只有三個地方會出現，而 `CompilerFactory` 是其中一個，這裡我們可以知道 `CompilerFactory` 是使用 `JitCompilerFactory` 來編譯 Component，這裡另外建立一個 Injector，所以這裡所註冊的 Provider 會限制於在此層級使用
 
@@ -279,151 +420,4 @@ platformBrowserDynamic().bootstrapModule(AppModule);
 ```
 
 以上就是 Angular 建置 Injector 的基本流程
-
-
-
-# 註冊 providers 
-
-我們可以在 `NgModule` 與 `Component` 這兩個地方註冊 providers，
-
-```typescript
-@NgModule({
-  imports: [
-    BrowserModule
-  ],
-  declarations: [
-   ...
-  ],
-  providers: [
-    UserService, // 註冊 provider
-    { provide: APP_CONFIG, useValue: HERO_DI_CONFIG }
-  ],
-  bootstrap: [ AppComponent ]
-})
-export class AppModule { }
-```
-
-```typescript
-import { Component }          from '@angular/core';
-
-import { HeroService }        from './hero.service';
-
-@Component({
-  selector: 'my-heroes',
-  providers: [HeroService], // 註冊 provider
-  ...
-})
-export class HeroesComponent { }
-```
-
-而註冊這這兩個地方的差異性是影響的層級，如果 provider 是註冊在 `NgModule` 時，是註冊在 Application 層級或是 Module 層級，在該層級下的所有人都可以使用到同一個 provider，註冊在 `Component` 時，只能在該 component 及向下的子 component 可以使用而已。所以可依據該 provider 的使用群組來決定要註冊在哪一個地方
-
-註冊 provider 的方式有很多種，但是在這之前，必須提到 `@Injectable` 這個 decorator，任何需要被註冊到 provider 裡的 service 都必須掛有 `@Injectable` ，不然 Injector 會報錯誤，雖然這表示不需註冊至 provider 內的 service 不需要標示為 `@Injectable`，但官網建議為了一致性，還是將其 decorator 標上。
-
-
-
-## 註冊方法
-
-Angular Provider 的註冊方式有以下幾種
-
-1. shorthand 表示法：直接將 service 註冊到 providers 內
-
-   ```typescript
-   providers: [Logger]
-   ```
-
-   這種註冊式方式等同於下一個的寫法
-
-2. useClass : 會建立一個新的 instance
-
-   ```typescript
-   providers:[
-       {provide: Logger, useClass: Logger}
-   ]
-   ```
-
-3. useExist：使用已存在的 provider，有使用別名的效果
-
-   ```typescript
-   providers:[
-       Logger,
-       {provide: myLogger, useExist: Logger}
-   ]
-   ```
-
-4. useValue：單純的想提供值而非一個 class 時，就可以使用 useValue 的方式註冊，建議搭配 InjectionToken 一起使用
-
-   ```typescript
-   import { InjectionToken } from '@angular/core';
-
-   export let APP_CONFIG = new InjectionToken<AppConfig>('app.config');
-   ...
-   providers: [{ provide: APP_CONFIG, useValue: HERO_DI_CONFIG }]
-   ```
-
-5. useFactory：利用工廠模式來建立 Class 實體
-
-   ```typescript
-   let heroServiceFactory = (logger: Logger, userService: UserService) => {
-     return new HeroService(logger, userService.user.isAuthorized);
-   };
-   ...
-   providers:[
-       { provide: HeroService,
-         useFactory: heroServiceFactory,
-         deps: [Logger, UserService]
-       }
-   ]  
-   ```
-
-   **deps** 提供 FacotryClass 所需的 dependence class
-
-
-
-# 使用 providers
-
-當完成註冊 providers 後，要如何使用已註冊的 provider 呢? 以 component 為例，將要使用的 provider 列在 constructor 內，Angular 在 compiler 時就會進行分析並將設定的 provider 提供給 Component 使用
-
-可以透過以下的三種方式
-
-1. 直接使用 provider type 
-
-```typescript
-export class HeroListComponent {
-  heroes: Hero[];
- 
-  constructor(heroService: HeroService) {
-    this.heroes = heroService.getHeroes();
-  }
-}
-```
-
-2. 使用 Injector
-
-```typescript
-  constructor(private injector: Injector) {
-    heroService = this.injector.get(HeroService);
-    this.heroes = heroService.getHeroes();
-  }
-```
-
-3. `@Inject`
-
-註冊 providers 時，有時候會使用 `useValue` 的方式註冊 Value 至 provider 內，這時需透過 `@Inject()` 的方式取得所註冊的值
-
-```typescript
-import { InjectionToken } from '@angular/core';
-
-export let APP_CONFIG = new InjectionToken<AppConfig>('app.config');
-providers: [{ provide: APP_CONFIG, useValue: HERO_DI_CONFIG }]
-
-// component
-constructor(@Inject(APP_CONFIG) config: AppConfig) {
-  this.title = config.title;
-}
-```
-
-
-
-# 進階使用技巧
 
