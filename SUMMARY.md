@@ -25,7 +25,7 @@
   * [ngModules](chapter4/ng-modules.md)
 * Component
 * Directive
-* Pipe
+* [Pipe](chapter7/README.md)
 * 路由 Routing
 * [表單 Form](chapter9/README.md)
 * [HttpClient](chapter10/README.md)
