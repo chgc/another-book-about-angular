@@ -1,6 +1,6 @@
 # Pipe 與 ChangeDetection
 
-Angular 會透過 `change detection` 方法執行的過程中，去檢查 data-bound值的變化，而 `change detection` 會在每一次 DOM Eevent 後被觸發，例如按下鍵盤的鍵，滑鼠的移動，伺服器的回應等事件，這個過程是需要付出相對的成本，為了效能，Angular會盡量降低 `change detection` 的次數
+Angular 會透過 `Change Detection` 方法執行的過程中，去檢查 data-bound值的變化，而 `Change Detection` 會在每一次 DOM Event 後被觸發，例如按下鍵盤的鍵、滑鼠的移動、伺服器的回應等事件，這個過程是需要付出相對的成本，為了效能，Angular 會盡量降低 `Change Detection` 的次數。
 
 所以 Pipe 會採用最簡單又快速的判斷規則，[ChangeDetectionStrategy.OnPush](https://angular.io/docs/ts/latest/api/core/index/ChangeDetectionStrategy-enum.html)。
 
