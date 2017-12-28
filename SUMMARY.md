@@ -32,8 +32,4 @@
 * [DI 機制](chapter11/README.md)
 * [動畫 Animations](chapter12/animations.md)
 * [測試](chapter13/README.md)
-* 應用範例
-  * ngrx
-  * i18n
-  * PWA
 
