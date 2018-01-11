@@ -6,8 +6,8 @@
 
 在這個章節，會從 0 至 100 的介紹 DI，希望當看完這章節後，能愛上 Dependency Injection 的開發模式
 
-* [為什麼需要使用依賴注入](why-di.md)
-* [Angular Dependency Injection Framework](di.md)
+* 為什麼需要使用依賴注入
+* Angular Dependency Injection Framework
 
 
 

@@ -7,11 +7,3 @@
 1. 單元測試
 2. 整合測試
 3. End-to-end 測試 (E2E)
-
-在這個章節會包含以下的內容
-
-1. [測試框架](introduction.md)
-2. [單元方法](unit-test.md)
-3. [整合測試](integration-test.md)
-
-
