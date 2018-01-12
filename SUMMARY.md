@@ -30,7 +30,7 @@
   - [自訂 PIPE](chapter7/custom-pipe.md)
   - [Pipe 與 ChangeDetection](chapter7/cd-pipe.md)
   - [Pure and Impure Pipes](chapter7/pure-impure.md)
-* 路由 Routing
+* [路由 Routing](chapter8/router.md)
 * [表單 Form](chapter9/README.md)
   * [Template Driven Form](chapter9/template-driven-basic.md)
   * [Model Drive Form (Reactive Form)](chapter9/reactive-form-basic.md)
@@ -43,7 +43,7 @@
   - [Angular Dependency Injection Framework](chapter11/di.md)
 * [動畫 Animations](chapter12/animations.md)
 * [測試](chapter13/README.md)
-  1. [測試框架](chapter13/introduction.md)
-  2. [單元方法](chapter13/unit-test.md)
-  3. [整合測試](chapter13/integration-test.md)
+  * [測試框架](chapter13/introduction.md)
+  * [單元方法](chapter13/unit-test.md)
+  * [整合測試](chapter13/integration-test.md)
 
