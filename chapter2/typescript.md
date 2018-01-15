@@ -872,7 +872,7 @@ let greeter = new Greeter("world");
 
 我們所預期 Class 應有的特性，例如說繼承，實作介面、存取修飾詞，靜態等，TypeScript 都有提供
 
-###Inheritance
+### Inheritance
 
 繼承是物件導向裡一個重要的觀念。幾個重點先知道
 
