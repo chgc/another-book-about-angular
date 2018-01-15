@@ -26,10 +26,26 @@
 * Component
 * Directive
 * [Pipe](chapter7/README.md)
+  - [內建 PIPE](chapter7/default-pipe.md)
+  - [自訂 PIPE](chapter7/custom-pipe.md)
+  - [Pipe 與 ChangeDetection](chapter7/cd-pipe.md)
+  - [Pure and Impure Pipes](chapter7/pure-impure.md)
 * 路由 Routing
+  * [基本設定](chapter8/router.md)
+  * [Guard](chapter8/guard.md)
 * [表單 Form](chapter9/README.md)
+  * [Template Driven Form](chapter9/template-driven-basic.md)
+  * [Model Drive Form (Reactive Form)](chapter9/reactive-form-basic.md)
 * [HttpClient](chapter10/README.md)
+  * [基本用法](chapter10/httpclient-basic.md)
+  * [進階用法](chapter10/httpclient-advance.md)
+  * [測試](chapter10/httpclient-test.md)
 * [DI 機制](chapter11/README.md)
+  - [為什麼需要使用依賴注入](chapter11/why-di.md)
+  - [Angular Dependency Injection Framework](chapter11/di.md)
 * [動畫 Animations](chapter12/animations.md)
 * [測試](chapter13/README.md)
+  * [測試框架](chapter13/introduction.md)
+  * [單元方法](chapter13/unit-test.md)
+  * [整合測試](chapter13/integration-test.md)
 

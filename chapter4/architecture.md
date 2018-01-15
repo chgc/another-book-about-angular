@@ -111,10 +111,10 @@ Component 也有裝飾器，`@Component` ， 裡面會定義幾個重要的項�
 
 Angular 提供 4 種方式來處理 template 與 component class 間的互動
 
-* {{ expr }} ：將 component 的屬性顯示在 template 上
-* [property]：將 component 的屬性綁定到 template html 元素的屬性上
-* (event)：將 component 的方法綁定到 template html 元素的事件上
-* [( two-way-binding )]="property"：雙向綁定的語法糖
+* `{{ expr }}` ：將 component 的屬性顯示在 template 上
+* `[property]`：將 component 的屬性綁定到 template html 元素的屬性上
+* `(event)`：將 component 的方法綁定到 template html 元素的事件上
+* `[( two-way-binding )]="property"`：雙向綁定的語法糖
 
 ```typescript
 <li>{{hero.name}}</li>

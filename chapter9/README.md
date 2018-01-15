@@ -4,6 +4,6 @@
 
 Angular 有兩類型的 FormModule，一個是熟悉的 Template-Driven Form，另外一個是 Angular 新推出的 Reactive Form。這一個章節，會分別的介紹這兩種類型的表單機制
 
-* [Template Driven Form](template-driven-basic.md)
-* [Model Drive Form (Reactive Form)](reactive-form-basic.md)
+* Template Driven Form
+* Model Drive Form (Reactive Form)
 
