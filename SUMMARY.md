@@ -30,7 +30,9 @@
   - [自訂 PIPE](chapter7/custom-pipe.md)
   - [Pipe 與 ChangeDetection](chapter7/cd-pipe.md)
   - [Pure and Impure Pipes](chapter7/pure-impure.md)
-* [路由 Routing](chapter8/router.md)
+* 路由 Routing
+  * [基本設定](chapter8/router.md)
+  * [Guard](chapter8/guard.md)
 * [表單 Form](chapter9/README.md)
   * [Template Driven Form](chapter9/template-driven-basic.md)
   * [Model Drive Form (Reactive Form)](chapter9/reactive-form-basic.md)
