@@ -1,4 +1,4 @@
-## 基本設定
+# Router 設定
 
 Angular 設定路由的方式有兩種，`RouterModule.forRoot` 跟 `RouterModule.forChild`，這兩個方法都接受 `Routes`，而 `forRoot` 還可以額外傳入設定參數
 
@@ -135,4 +135,133 @@ interface Route {
 * `paramsInheritanceStrategy` 設定路由在子路由時處理 `params`、`data`、`resolve` 資料的方法
   * `emptyOnly` 預設值，只會繼承沒有設定路徑或是 component 的規則
   * `always` 無條件的繼承父層的參數
+
+
+
+
+# 基本
+
+## routerLink
+
+Angular 裡要進行網址間的瀏覽時，頁面上可透過`routerLink` 來達成，有兩種使用方法，如下
+
+```html
+<nav>
+  <a routerLink="/crisis-center" routerLinkActive="active">Crisis Center</a>
+  <a [routerLink]="['/heroes']" routerLinkActive="active">Heroes</a>
+</nav>
+```
+
+當使用 `[routerLink]` 時，後面可以接受的值為一個陣列，陣列內可包含 `path` 和 `parameters`，寫法如下
+
+```html
+<a [routerLink]="['/heroes']">Heroes</a>
+<a [routerLink]="['/hero', hero.id]">Hero</a>
+<a [routerLink]="['/crisis-center', { foo: 'foo' }]">Crisis Center</a>
+```
+
+細部分解一下，假設有一個 `routerLink` 是這樣 `[routerLink]="['/heroes']"` ，輸出的網址為 `/heroes`，而 `/` 並非一定要寫，如果沒有寫則會以目前的路徑為起始位置
+
+那`[routerLink]="['/heroes', 1]"` 網址則會是 `/heroes/1`，這也會等同於 `[routerLink]="['/heroes/1']"`
+
+而 `<a [routerLink]="['/crisis-center', { foo: 'foo' }]">Crisis Center</a>` 會呈現怎樣的網址呢? 網址會是 `/crisis-center;foo=foo`，這種呈現方式，又稱為 `matrix parameters`
+
+`RouterLink `  directive 可接受以下幾種 Input 值，我們可以直接在 template 上直接設定使用
+
+* `queryParams` 
+
+  ```html
+  // 呈現網址: /user/bob?debug=true
+  <a [routerLink]="['/user/bob']" [queryParams]="{debug: true}">
+    link to user component
+  </a>
+  ```
+
+* `fragment` 
+
+  ```html
+  // 呈現網址: /user/bob#education
+  <a [routerLink]="['/user/bob']" fragment="education">
+    link to user component
+  </a>
+  ```
+
+* `queryParamsHandling`，設定 `queryParams` 該如何處理；有三種模式
+
+  * `merge` 合併 `queryParams` 至目前的 `queryParams `裡
+  * `preserve` 保留目前的 `queryParams`
+  * 空白(預設值) 使用者定的 `queryParams`
+
+  ```html
+  // 假設目前的位置是 /users/?show=list
+  // 使用 merge 後網址會是 /users/?show=list&debug=true
+  <a [routerLink]="['/user/bob']" [queryParams]="{debug: true}" queryParamsHandling="merge">
+    link to user component
+  </a>
+  // 使用 preserve 後網址會是 /users/?show=list
+  <a [routerLink]="['/user/bob']" [queryParams]="{debug: true}" queryParamsHandling="preserve">
+    link to user component
+  </a>
+  // 預設行為，網址會是 /users/?debug=true
+  <a [routerLink]="['/user/bob']" [queryParams]="{debug: true}">
+    link to user component
+  </a>
+  ```
+
+  ​
+
+* `preserveFragment` 當設定為 `true` 時，會保留目前的 fragment 
+
+* `skipLocationChange` 是否要瀏覽至新位置但不留下歷史紀錄
+
+* `replaceUrl` 設定是否要更換目前在 History API 裡的狀態
+
+* `preserveQueryParams` (已於版本 4 標註已過時，請使用 `queryParamsHandling`)
+
+## routerLinkActive
+
+`routerLinkActive` 提供的功能是，當目前的位置符合目前所在元素所設定的 `routerLink` 時，新增 `routerLinkActive` 所指定的 CSS 樣式
+
+```html
+<a routerLink="/user/bob" routerLinkActive="active-link">Bob</a>
+```
+
+當網址瀏覽到 `/user/bob` 時，這一個 `<a>` 會加上 `active-link`  CSS 樣式，這裡可以設定一個以上的 CSS 樣式
+
+```html
+<a routerLink="/user/bob" routerLinkActive="class1 class2">Bob</a>
+<a routerLink="/user/bob" [routerLinkActive]="['class1', 'class2']">Bob</a>
+```
+
+**延伸用法**
+
+* 設定完整比對，設定 `routerLinkActiveOptions` 為 `{exact: true}`
+
+  ```html
+  <a routerLink="/user/bob" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
+  true}">Bob</a>
+  ```
+
+* 輸出 `routerLinkActive` 直接操作 `routerLinkActive` 內的方法
+
+  ```html
+  <a routerLink="/user/bob" routerLinkActive #rla="routerLinkActive">
+    Bob {{ rla.isActive ? '(already open)' : ''}}
+  </a>
+  ```
+
+* 另外一種設定方式，外層設定會套用到裡面的 `routerLink`
+
+  ```html
+  <div routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
+    <a routerLink="/user/jim">Jim</a>
+    <a routerLink="/user/bob">Bob</a>
+  </div>
+  ```
+
+
+
+## Route State
+
+在 component 內常用取得目前網址狀態的方法有兩種，`ActivatedRoute` 與 `Router` 服務
 
