@@ -265,3 +265,158 @@ Angular 裡要進行網址間的瀏覽時，頁面上可透過`routerLink` 來�
 
 在 component 內常用取得目前網址狀態的方法有兩種，`ActivatedRoute` 與 `Router` 服務
 
+* `activatedRoute` 可用來取得目前網址狀態的物件，有提供以下的屬性資料
+
+  * `url`  陣列內包含目前的網址狀態，是一個 Observable 物件
+  * `data` 包含 routes 內設定的 `data` 及 `resolve` 所回傳的資料物件，是一個 Observable 物件
+  * `paramMap` 網址參數，是一個 Observable 物件
+  * `queryParamMap` 取得 `query parameter` ，是一個 Observable 物件
+  * `fragment` 取得 `fragment` ，是一個 Observable 物件
+  * `outlet` 取得目前所處的 outlet 名稱，如果是空白時會回傳 `primary`
+  * `routeConfig` 取得 `routeConfig`
+  * `parent` 取得上層的 `activatedRoute`
+  * `firstChild` 取得下層第一個 `activatedRoute`
+  * `children` 取得所有下層的 `activatedRoute`
+  * `params` 與 `queryParams` 還是存在著，但是建議使用 `paramMap` 與 `queryParamMap` 取代
+
+* `Router` 服務，提供更多的功能，包含轉址之類的功能，功能有
+
+  * `events` 取得路由事件包，可用來監控或是針對某一個路由事件時加入額外的功能
+
+  * `routerState` 
+
+  * `errorHandler` 
+
+  * `navigated` 判斷是否有瀏覽行為發生
+
+  * `urlHandlingStrategy` 主要適用於 AngularJS to Angular 升級情境
+
+  * `routeReuseStrategy` 設定當作用路由遭重複使用時該如何動作
+
+  * `onSamerUrlNavigation`  設定瀏覽相同網址時，是否觸發路由事件；`reload` | `ignore`
+
+  * `paramsInheritanceStrategy` 設定參數繼承規則；`emptyOnly` | `always`
+
+  * `config`
+
+  * `initialNavigation()` 設定 location change listener 並觸發第一次瀏覽事件
+
+  * `setUpLocationChangeListener()` 設定 location change listener
+
+  * `url` 取得目前的網址
+
+  * `resetConfig(config: Routes)` 重新設定路由規則
+
+    ```typescript
+    router.resetConfig([
+     { path: 'team/:id', component: TeamCmp, children: [
+       { path: 'simple', component: SimpleCmp },
+       { path: 'user/:name', component: UserCmp }
+     ]}
+    ]);
+    ```
+
+  * `createUrlTree(commands: any[], navigationExtras: NavigationExtras = {}): UrlTree`  建立 UrlTree
+
+    ```typescript
+    // create /team/33/user/11
+    router.createUrlTree(['/team', 33, 'user', 11]);
+
+    // create /team/33;expand=true/user/11
+    router.createUrlTree(['/team', 33, {expand: true}, 'user', 11]);
+
+    // you can collapse static segments like this (this works only with the first passed-in value):
+    router.createUrlTree(['/team/33/user', userId]);
+
+    // If the first segment can contain slashes, and you do not want the router to split it, you
+    // can do the following:
+
+    router.createUrlTree([{segmentPath: '/one/two'}]);
+
+    // create /team/33/(user/11//right:chat)
+    router.createUrlTree(['/team', 33, {outlets: {primary: 'user/11', right: 'chat'}}]);
+
+    // remove the right secondary node
+    router.createUrlTree(['/team', 33, {outlets: {primary: 'user/11', right: null}}]);
+
+    // assuming the current url is `/team/33/user/11` and the route points to `user/11`
+
+    // navigate to /team/33/user/11/details
+    router.createUrlTree(['details'], {relativeTo: route});
+
+    // navigate to /team/33/user/22
+    router.createUrlTree(['../22'], {relativeTo: route});
+
+    // navigate to /team/44/user/22
+    router.createUrlTree(['../../team/44/user/22'], {relativeTo: route});
+    ```
+
+  * `navigateByUrl(url: string | UrlTree, extras: NavigationExtras = { skipLocationChange: false }): Promise<boolean>` 瀏覽至所提供的絕對網址，所回傳的 promise 結果當 `true` 時表示轉址成功，`false` 表示失敗，當被拒絕時會發生錯誤
+
+    ```typescript
+    router.navigateByUrl("/team/33/user/11");
+
+    // Navigate without updating the URL
+    router.navigateByUrl("/team/33/user/11", { skipLocationChange: true });
+    ```
+
+  * `navigate(commands: any[], extras: NavigationExtras = { skipLocationChange: false }): Promise<boolean>` 根據提供的 `commands` 進行瀏覽動作
+
+    ```typescript
+    router.navigate(['team', 33, 'user', 11], {relativeTo: route});
+
+    // Navigate without updating the URL
+    router.navigate(['team', 33, 'user', 11], {relativeTo: route, skipLocationChange: true});
+    ```
+
+  * `serializeUrl` 將 `UrlTree` 轉換成文字
+
+  * `parseUrl` 將文字轉換成 `UrlTree`
+
+  * `isActive(url: string | UrlTree, exact: boolean): boolean` 判斷網址是否作用中
+
+## UrlTree
+
+`UrlTree` 是用來表示網址資訊的物件
+
+```typescript
+interface UrlTree { 
+  root: UrlSegmentGroup
+  queryParams: {...}
+  fragment: string | null
+  get queryParamMap: ParamMap
+  toString(): string
+}
+```
+
+參考用法
+
+```typescript
+@Component({templateUrl:'template.html'})
+class MyComponent {
+  constructor(router: Router) {
+    const tree: UrlTree =
+      router.parseUrl('/team/33/(user/victor//support:help)?debug=true#fragment');
+    const f = tree.fragment; // return 'fragment'
+    const q = tree.queryParams; // returns {debug: 'true'}
+    const g: UrlSegmentGroup = tree.root.children[PRIMARY_OUTLET];
+    const s: UrlSegment[] = g.segments; // returns 2 segments 'team' and '33'
+    g.children[PRIMARY_OUTLET].segments; // returns 2 segments 'user' and 'victor'
+    g.children['support'].segments; // return 1 segment 'help'
+  }
+}
+```
+
+## Router events
+
+整個路由切換時，會有以下的事件發生
+
+* `NavigationStart`
+* `RoutesRecognized`
+* `RouteConfigLoadStart`
+* `RouteConfigLoadEnd`
+* `NavigationEnd`
+* `NavigationCancel`
+* `navigationError`
+
+路由事件透過 `Router` service 可取得 `events` Observable 物件，可透過 `filter `的方式取得特定的事件類別
