@@ -1,4 +1,4 @@
-## 基本設定
+# Router 設定
 
 Angular 設定路由的方式有兩種，`RouterModule.forRoot` 跟 `RouterModule.forChild`，這兩個方法都接受 `Routes`，而 `forRoot` 還可以額外傳入設定參數
 
@@ -136,3 +136,287 @@ interface Route {
   * `emptyOnly` 預設值，只會繼承沒有設定路徑或是 component 的規則
   * `always` 無條件的繼承父層的參數
 
+
+
+
+# 基本
+
+## routerLink
+
+Angular 裡要進行網址間的瀏覽時，頁面上可透過`routerLink` 來達成，有兩種使用方法，如下
+
+```html
+<nav>
+  <a routerLink="/crisis-center" routerLinkActive="active">Crisis Center</a>
+  <a [routerLink]="['/heroes']" routerLinkActive="active">Heroes</a>
+</nav>
+```
+
+當使用 `[routerLink]` 時，後面可以接受的值為一個陣列，陣列內可包含 `path` 和 `parameters`，寫法如下
+
+```html
+<a [routerLink]="['/heroes']">Heroes</a>
+<a [routerLink]="['/hero', hero.id]">Hero</a>
+<a [routerLink]="['/crisis-center', { foo: 'foo' }]">Crisis Center</a>
+```
+
+細部分解一下，假設有一個 `routerLink` 是這樣 `[routerLink]="['/heroes']"` ，輸出的網址為 `/heroes`，而 `/` 並非一定要寫，如果沒有寫則會以目前的路徑為起始位置
+
+那`[routerLink]="['/heroes', 1]"` 網址則會是 `/heroes/1`，這也會等同於 `[routerLink]="['/heroes/1']"`
+
+而 `<a [routerLink]="['/crisis-center', { foo: 'foo' }]">Crisis Center</a>` 會呈現怎樣的網址呢? 網址會是 `/crisis-center;foo=foo`，這種呈現方式，又稱為 `matrix parameters`
+
+`RouterLink `  directive 可接受以下幾種 Input 值，我們可以直接在 template 上直接設定使用
+
+* `queryParams` 
+
+  ```html
+  // 呈現網址: /user/bob?debug=true
+  <a [routerLink]="['/user/bob']" [queryParams]="{debug: true}">
+    link to user component
+  </a>
+  ```
+
+* `fragment` 
+
+  ```html
+  // 呈現網址: /user/bob#education
+  <a [routerLink]="['/user/bob']" fragment="education">
+    link to user component
+  </a>
+  ```
+
+* `queryParamsHandling`，設定 `queryParams` 該如何處理；有三種模式
+
+  * `merge` 合併 `queryParams` 至目前的 `queryParams `裡
+  * `preserve` 保留目前的 `queryParams`
+  * 空白(預設值) 使用者定的 `queryParams`
+
+  ```html
+  // 假設目前的位置是 /users/?show=list
+  // 使用 merge 後網址會是 /users/?show=list&debug=true
+  <a [routerLink]="['/user/bob']" [queryParams]="{debug: true}" queryParamsHandling="merge">
+    link to user component
+  </a>
+  // 使用 preserve 後網址會是 /users/?show=list
+  <a [routerLink]="['/user/bob']" [queryParams]="{debug: true}" queryParamsHandling="preserve">
+    link to user component
+  </a>
+  // 預設行為，網址會是 /users/?debug=true
+  <a [routerLink]="['/user/bob']" [queryParams]="{debug: true}">
+    link to user component
+  </a>
+  ```
+
+  ​
+
+* `preserveFragment` 當設定為 `true` 時，會保留目前的 fragment 
+
+* `skipLocationChange` 是否要瀏覽至新位置但不留下歷史紀錄
+
+* `replaceUrl` 設定是否要更換目前在 History API 裡的狀態
+
+* `preserveQueryParams` (已於版本 4 標註已過時，請使用 `queryParamsHandling`)
+
+## routerLinkActive
+
+`routerLinkActive` 提供的功能是，當目前的位置符合目前所在元素所設定的 `routerLink` 時，新增 `routerLinkActive` 所指定的 CSS 樣式
+
+```html
+<a routerLink="/user/bob" routerLinkActive="active-link">Bob</a>
+```
+
+當網址瀏覽到 `/user/bob` 時，這一個 `<a>` 會加上 `active-link`  CSS 樣式，這裡可以設定一個以上的 CSS 樣式
+
+```html
+<a routerLink="/user/bob" routerLinkActive="class1 class2">Bob</a>
+<a routerLink="/user/bob" [routerLinkActive]="['class1', 'class2']">Bob</a>
+```
+
+**延伸用法**
+
+* 設定完整比對，設定 `routerLinkActiveOptions` 為 `{exact: true}`
+
+  ```html
+  <a routerLink="/user/bob" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
+  true}">Bob</a>
+  ```
+
+* 輸出 `routerLinkActive` 直接操作 `routerLinkActive` 內的方法
+
+  ```html
+  <a routerLink="/user/bob" routerLinkActive #rla="routerLinkActive">
+    Bob {{ rla.isActive ? '(already open)' : ''}}
+  </a>
+  ```
+
+* 另外一種設定方式，外層設定會套用到裡面的 `routerLink`
+
+  ```html
+  <div routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
+    <a routerLink="/user/jim">Jim</a>
+    <a routerLink="/user/bob">Bob</a>
+  </div>
+  ```
+
+
+
+## Route State
+
+在 component 內常用取得目前網址狀態的方法有兩種，`ActivatedRoute` 與 `Router` 服務
+
+* `activatedRoute` 可用來取得目前網址狀態的物件，有提供以下的屬性資料
+
+  * `url`  陣列內包含目前的網址狀態，是一個 Observable 物件
+  * `data` 包含 routes 內設定的 `data` 及 `resolve` 所回傳的資料物件，是一個 Observable 物件
+  * `paramMap` 網址參數，是一個 Observable 物件
+  * `queryParamMap` 取得 `query parameter` ，是一個 Observable 物件
+  * `fragment` 取得 `fragment` ，是一個 Observable 物件
+  * `outlet` 取得目前所處的 outlet 名稱，如果是空白時會回傳 `primary`
+  * `routeConfig` 取得 `routeConfig`
+  * `parent` 取得上層的 `activatedRoute`
+  * `firstChild` 取得下層第一個 `activatedRoute`
+  * `children` 取得所有下層的 `activatedRoute`
+  * `params` 與 `queryParams` 還是存在著，但是建議使用 `paramMap` 與 `queryParamMap` 取代
+
+* `Router` 服務，提供更多的功能，包含轉址之類的功能，功能有
+
+  * `events` 取得路由事件包，可用來監控或是針對某一個路由事件時加入額外的功能
+
+  * `routerState` 
+
+  * `errorHandler` 
+
+  * `navigated` 判斷是否有瀏覽行為發生
+
+  * `urlHandlingStrategy` 主要適用於 AngularJS to Angular 升級情境
+
+  * `routeReuseStrategy` 設定當作用路由遭重複使用時該如何動作
+
+  * `onSamerUrlNavigation`  設定瀏覽相同網址時，是否觸發路由事件；`reload` | `ignore`
+
+  * `paramsInheritanceStrategy` 設定參數繼承規則；`emptyOnly` | `always`
+
+  * `config`
+
+  * `initialNavigation()` 設定 location change listener 並觸發第一次瀏覽事件
+
+  * `setUpLocationChangeListener()` 設定 location change listener
+
+  * `url` 取得目前的網址
+
+  * `resetConfig(config: Routes)` 重新設定路由規則
+
+    ```typescript
+    router.resetConfig([
+     { path: 'team/:id', component: TeamCmp, children: [
+       { path: 'simple', component: SimpleCmp },
+       { path: 'user/:name', component: UserCmp }
+     ]}
+    ]);
+    ```
+
+  * `createUrlTree(commands: any[], navigationExtras: NavigationExtras = {}): UrlTree`  建立 UrlTree
+
+    ```typescript
+    // create /team/33/user/11
+    router.createUrlTree(['/team', 33, 'user', 11]);
+
+    // create /team/33;expand=true/user/11
+    router.createUrlTree(['/team', 33, {expand: true}, 'user', 11]);
+
+    // you can collapse static segments like this (this works only with the first passed-in value):
+    router.createUrlTree(['/team/33/user', userId]);
+
+    // If the first segment can contain slashes, and you do not want the router to split it, you
+    // can do the following:
+
+    router.createUrlTree([{segmentPath: '/one/two'}]);
+
+    // create /team/33/(user/11//right:chat)
+    router.createUrlTree(['/team', 33, {outlets: {primary: 'user/11', right: 'chat'}}]);
+
+    // remove the right secondary node
+    router.createUrlTree(['/team', 33, {outlets: {primary: 'user/11', right: null}}]);
+
+    // assuming the current url is `/team/33/user/11` and the route points to `user/11`
+
+    // navigate to /team/33/user/11/details
+    router.createUrlTree(['details'], {relativeTo: route});
+
+    // navigate to /team/33/user/22
+    router.createUrlTree(['../22'], {relativeTo: route});
+
+    // navigate to /team/44/user/22
+    router.createUrlTree(['../../team/44/user/22'], {relativeTo: route});
+    ```
+
+  * `navigateByUrl(url: string | UrlTree, extras: NavigationExtras = { skipLocationChange: false }): Promise<boolean>` 瀏覽至所提供的絕對網址，所回傳的 promise 結果當 `true` 時表示轉址成功，`false` 表示失敗，當被拒絕時會發生錯誤
+
+    ```typescript
+    router.navigateByUrl("/team/33/user/11");
+
+    // Navigate without updating the URL
+    router.navigateByUrl("/team/33/user/11", { skipLocationChange: true });
+    ```
+
+  * `navigate(commands: any[], extras: NavigationExtras = { skipLocationChange: false }): Promise<boolean>` 根據提供的 `commands` 進行瀏覽動作
+
+    ```typescript
+    router.navigate(['team', 33, 'user', 11], {relativeTo: route});
+
+    // Navigate without updating the URL
+    router.navigate(['team', 33, 'user', 11], {relativeTo: route, skipLocationChange: true});
+    ```
+
+  * `serializeUrl` 將 `UrlTree` 轉換成文字
+
+  * `parseUrl` 將文字轉換成 `UrlTree`
+
+  * `isActive(url: string | UrlTree, exact: boolean): boolean` 判斷網址是否作用中
+
+## UrlTree
+
+`UrlTree` 是用來表示網址資訊的物件
+
+```typescript
+interface UrlTree { 
+  root: UrlSegmentGroup
+  queryParams: {...}
+  fragment: string | null
+  get queryParamMap: ParamMap
+  toString(): string
+}
+```
+
+參考用法
+
+```typescript
+@Component({templateUrl:'template.html'})
+class MyComponent {
+  constructor(router: Router) {
+    const tree: UrlTree =
+      router.parseUrl('/team/33/(user/victor//support:help)?debug=true#fragment');
+    const f = tree.fragment; // return 'fragment'
+    const q = tree.queryParams; // returns {debug: 'true'}
+    const g: UrlSegmentGroup = tree.root.children[PRIMARY_OUTLET];
+    const s: UrlSegment[] = g.segments; // returns 2 segments 'team' and '33'
+    g.children[PRIMARY_OUTLET].segments; // returns 2 segments 'user' and 'victor'
+    g.children['support'].segments; // return 1 segment 'help'
+  }
+}
+```
+
+## Router events
+
+整個路由切換時，會有以下的事件發生
+
+* `NavigationStart`
+* `RoutesRecognized`
+* `RouteConfigLoadStart`
+* `RouteConfigLoadEnd`
+* `NavigationEnd`
+* `NavigationCancel`
+* `navigationError`
+
+路由事件透過 `Router` service 可取得 `events` Observable 物件，可透過 `filter `的方式取得特定的事件類別
