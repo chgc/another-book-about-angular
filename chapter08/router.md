@@ -242,13 +242,7 @@ Angular 裡要進行網址間的瀏覽時，頁面上可透過`routerLink` 來�
   true}">Bob</a>
   ```
 
-* 輸出 `routerLinkActive` 直接操作 `routerLinkActive` 內的方法
-
-  ```html
-  <a routerLink="/user/bob" routerLinkActive #rla="routerLinkActive">
-    Bob {{ rla.isActive ? '(already open)' : ''}}
-  </a>
-  ```
+* 輸出 `routerLinkActive` 直接操作 `routerLinkActive` 內的方法  
 
 * 另外一種設定方式，外層設定會套用到裡面的 `routerLink`
 
