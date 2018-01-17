@@ -23,7 +23,7 @@
 * Angular 概觀
   * [架構](chapter04/architecture.md)
   * [ngModules](chapter04/ng-modules.md)
-* Component
+* [Component](chapter05/component.md)
 * Directive
 * [Pipe](chapter07/README.md)
   - [內建 PIPE](chapter07/default-pipe.md)
