@@ -110,7 +110,18 @@ export class AppComponent {
 
 - **moduleId** - 當使用 ES/CommonJS 建置 Angular 專案時，須設定 module id ，如使用 Angular CLI 則不需要設定這個項目
 
-## 
+## 顯示資料
+
+component 要在 template 上顯示變數資料的方式，需透過 `interpolation` ，Angular 預設的 `interpolation` 是 `{{ }}` ，所以寫法會類似 `{{ title }}`
+
+component 另外一個跟顯示資料有關的項目為 `template` 與 `templateUrl` ，這兩種方法都可以，並沒有說哪一種作法比較好，只是這邊要另外提起的是，當使用 `template` 時，可利用 `ES2015(ES6)` 的 template string (反單引號) 的方式將 html 包起來，這種模式允許使用編輯一個多行的文字內容
+
+```typescript
+template: `
+  <h1>{{title}}</h1>
+  <h2>My favorite hero is: {{myHero}}</h2>
+  `
+```
 
 剩下的，就靠想像力了
 
