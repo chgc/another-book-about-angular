@@ -123,5 +123,26 @@ template: `
   `
 ```
 
-剩下的，就靠想像力了
+在使用 template syntax 有幾點需要特別留意，避免程式壞掉或是效能低落
+
+* no visible side effects : template syntax 不應該改變除了自己本身以外的變數，這是違反 Angular 的 `unidirectional data flow` 規則
+* quick execution : 如果在 template syntax 執行函示，例如 `{{ abc() }}` ，這種寫法會在每一次發生 `change detection` 循環時被執行一次，會造成網頁的效能低落
+* simplicity : template express 應保持單純簡單，簡單的邏輯判斷還是可以在 template express 裡使用，除此之外，邏輯相關的程式碼應盡量寫在 component 。
+* Idempotence ：An idempotent expression is ideal because it is free of side effects and improves Angular's change detection performance. 簡單的說，就是在一次 event loop 中，`idempotent expression` 不論呼叫幾次，總是回傳相同的值/物件/陣列。
+
+## Template Statements
+
+template statements 代表觸發一個事件，通常的寫法會是 `(event)="statement"` 
+
+```html
+<button type="button" (click)="doSomething()">Do Something</button>
+```
+
+這種模式下，有些語法是被限制
+
+* `new`
+* `increment` and `decrement` operators， `++` and `--`
+* operator assignment， `+=` and `-=`
+* bitwise operators， `|` and `&`
+* `template expression ` operators，類似 `pipe` 和 safe navigation operators (`?`) 和 non-null assertion (`!`)
 
