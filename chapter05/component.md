@@ -126,7 +126,7 @@ template: `
 在使用 template syntax 有幾點需要特別留意，避免程式壞掉或是效能低落
 
 * no visible side effects : template syntax 不應該改變除了自己本身以外的變數，這是違反 Angular 的 `unidirectional data flow` 規則
-* quick execution : 如果在 template syntax 執行函示，例如 `{{ abc() }}` ，這種寫法會在每一次發生 `change detection` 循環時被執行一次，會造成網頁的效能低落
+* quick execution : 如果在 template syntax 執行函示，例如 `{{ abc() }}` ，這種寫法會在每一次發生 `change detection` 循環時被執行一次，嚴重時會造成網頁的效能低落
 * simplicity : template express 應保持單純簡單，簡單的邏輯判斷還是可以在 template express 裡使用，除此之外，邏輯相關的程式碼應盡量寫在 component 。
 * Idempotence ：An idempotent expression is ideal because it is free of side effects and improves Angular's change detection performance. 簡單的說，就是在一次 event loop 中，`idempotent expression` 不論呼叫幾次，總是回傳相同的值/物件/陣列。
 
@@ -138,7 +138,7 @@ template statements 代表觸發一個事件，通常的寫法會是 `(event)="s
 <button type="button" (click)="doSomething()">Do Something</button>
 ```
 
-這種模式下，有些語法是被限制
+這種模式下，有些語法是被限制無法使用的，包括以下
 
 * `new`
 * `increment` and `decrement` operators， `++` and `--`
@@ -146,3 +146,148 @@ template statements 代表觸發一個事件，通常的寫法會是 `(event)="s
 * bitwise operators， `|` and `&`
 * `template expression ` operators，類似 `pipe` 和 safe navigation operators (`?`) 和 non-null assertion (`!`)
 
+
+## 綁定
+
+* one-way：component class => view，常見於 `Interpolation`、`Property`、`Attribute`、`Class`、`Style`
+
+  ```typescript
+  {{ expression }}
+  [target]="expression"
+  bind-target="expression"
+  ```
+
+* one-way：view => component class，使用情境為 `事件觸發`
+
+  ```html
+  (target)="statment"
+  on-target="statement"
+  ```
+
+* two-way：view <=> component class
+
+  ```html
+  [(target)]="expression"
+  bindon-target="expression"
+  ```
+
+這裡需要留意的是， 不論是使用 `[ ]` 或是  `bind-` 都是針對 property 而非 attribute。如果真的要綁定 `attribute` 的話，是可以使用 `attr.xxxx` 來代表說要綁定 `attribute` 下的某一個屬性
+
+```html
+<button [attr.aria-label]="help">help</button>
+```
+
+## 自訂屬性
+
+Angular 自訂屬性的方法有兩種，`@Input` 與 `@Attribute`。
+
+### @Attribute
+
+#### 基本寫法
+
+`@Attribute` 可讓 component 擁有一個一次性的 attribute 屬性可供傳入常數值使用
+
+而基本的使用方式及設定程式碼如下，這裡的 age 就是透過 `@Attribute` 建立出來的
+
+```html
+<hello name="{{ name }}" age="30"></hello>
+```
+
+```typescript
+import { Component, Input, Attribute } from '@angular/core';
+
+@Component({
+  selector: 'hello',
+  template: `<h1>Hello {{name}}! My age is {{ age }}</h1>`,
+  styles: [`h1 { font-family: Lato; }`]
+})
+export class HelloComponent  {
+  @Input() name: string;
+  constructor(@Attribute('age') private age){
+  }
+}
+
+```
+
+透過這種方式定義出來的 `attribute` 是不能使用任何 binding 的形式傳值，只能直接給予值，並只能在 `constructor` 設定。
+
+#### 使用情境
+
+假設有一個共用的元件，希望可以從外部直接指定使用方式，而這一個設定是不會改變的，那這時候使用 `@Attribute` 來設定就很合適。
+
+```typescript
+import { Component, Attribute } from '@angular/core';
+
+export type ButtonType = 'primary' | 'secondary';
+
+@Component({
+  selector: 'app-button',
+  template: `
+    <button [ngClass]="type">
+      <ng-content></ng-content>
+    </button>
+  `
+})
+export class ButtonComponent {
+  constructor(@Attribute('type') public type: ButtonType = 'primary') { }
+}
+```
+
+```html
+<app-button type="secondary">Action Button</app-button>
+```
+
+### @Input
+
+利用 `@Input` 可以讓 component 接受外部傳入的資料。基本的使用方法有
+
+```typescript
+@Input() hero; // 變數名稱等同於屬性名稱
+@Input('heroData') hero; // 自訂屬性名稱
+```
+
+當 `@Input` 資料發生變化時，會觸發 `OnChanges` 事件，但這裡有一個地方要留意的是 `changeDetection` 的設定值，當設定值為 `ChangeDetectionStrategy.OnPush` 時，`OnChanges` 事件只會發生在 `@Input` 接受到一個全新的資料時。
+
+外部的使用方法
+
+```html
+<!-- @Input() hero -->
+<app-hero-detail [hero]="currentHero"></app-hero-detail>
+<!-- @Input('heroData') hero -->
+<app-hero-detail [heroData]="currentHero"></app-hero-detail>
+```
+
+
+
+## 自訂事件 
+
+利用 `EventEmiiter` 與 `@Output` 可以為 `component` 建立自訂事件的介面，範例程式
+
+```html
+<div>
+  <img src="{{heroImageUrl}}">
+  <span [style.text-decoration]="lineThrough">
+    {{prefix}} {{hero?.name}}
+  </span>
+  <button (click)="delete()">Delete</button>
+</div>
+```
+
+希望按下 `Delete` 按鈕時，可以通知外部使用者，有刪除事件發生，component 的程式如下
+
+```typescript
+// This component makes a request but it can't actually delete a hero.
+@Output() deleteRequest = new EventEmitter<Hero>();
+
+delete() {
+  this.deleteRequest.emit(this.hero);
+}
+```
+
+component 對外的使用方式是
+
+```html
+<app-hero-detail (deleteRequest)="deleteHero($event)" [hero]="currentHero"></app-hero-detail>
+```
+
+這裡的 `$event` 所接受的到值就是 `emit` 時傳入的資料，可利用這樣的模式，將一些跟 api 互動的行為從 `component` 本身抽離，讓 `component` 變得更單純。
