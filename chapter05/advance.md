@@ -11,7 +11,7 @@
 
 看起來很像，但到底差異在哪裡呢? 主要差異是在於子 component 的呈現方式會因不同註冊服務的方式而有所不同
 
-# 基本環境設定
+### 基本環境設定
 
 來解釋一下，但先準備一下程式環境
 
@@ -63,7 +63,7 @@ export class SimpleService {
 }
 ```
 
-# NgModule.providers
+### NgModule.providers
 
 ```typescript
 @NgModule({
@@ -92,7 +92,7 @@ export class AppModule { }
 
 (圖片擷取至[codecraft.tv](https://codecraft.tv))
 
-# Component.providers
+### Component.providers
 
 這時當 `ParentComponent` 註冊 `SimpleService` 到 `providers` 內時，會有怎樣的效果呢
 
@@ -130,7 +130,7 @@ export class ParentComponent {
 
 在這個情境，不論 `ChildComponent` 是已哪一種方式顯示在 `ParentComponent` 都會存取到註冊在 `ParentComponent` 的 providers，而因為 `AppComponent` 有兩個 `ParentComponent` ，所以各自有各自的 `SimpleService` 互不干擾
 
-# Component.viewProviders
+### Component.viewProviders
 
 如果將 `SimpleService` 註冊到 `viewProviders` 時，並子 component 是透過 `<ng-content>` 映射到 `ParentComponent` 時
 
@@ -172,4 +172,36 @@ export class ParentComponent {
 (圖片擷取至[codecraft.tv](https://codecraft.tv))
 
 `viewProviders` 比較特殊一點，透過 `<ng-content>` 呈現與不透過 `<ng-content>` 的結果不一樣，假設使用 `<ng-content>` 的方式將 `ChildComponent` 映射到 `ParentComponent` 時，兩者所讀取的 `SimpleService` 會是不同一個 (可參閱上圖)；但如果是直接在 `ParentComponent` 上使用 `ChildComponent` 時，所存取的 `SimpleService` 就會跟 `ParentComponent` 一樣，這部分就要留意了
+
+
+
+## ng-content
+
+如果想要將外部的內容新增到 component 本身中，可以透過 `ng-content` 的方法達到，基本使用方式為
+
+```html
+<div>
+    <ng-content></ng-content>
+</div>
+```
+
+此為 component template 的部分，外部的使用方式如下
+
+```html
+<my-comp>
+	<p>
+        some content....
+    </p>
+</my-comp>
+```
+
+任何放到 `<my-comp>` 裡的內容都會被映射到 `<ng-content>` 
+
+關於生命週期的事情，Angualr 除了 `AfterViewInited` 和 `AfterViewChecked`，針對 `<ng-content>` 也有對應的事件，`AfterContentInited` 與 `AfterContentCheecked`
+
+Component 本身如果要取得 `<ng-content>` 的內容時，可以透過 `@ContentChild` 或是 `@ContentChildren` 的方法取得
+
+### 進階
+
+任何 compnent 透過 `ng-content` 的方式產生，都會被建構出來
 
