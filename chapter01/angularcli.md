@@ -12,9 +12,9 @@ Angular CLI 是 Angular Team 與社群一起合作創造出來的工具，Angula
 
 ![](images/npminstall.jpg)
 
-當安裝完成後，可以透過 `ng -v` 的指令來檢查安裝的版本
+當安裝完成後，可以透過 `ng v` 的指令來檢查安裝的版本
 
-![](images/2017-08-16_19-56-50.jpg)
+![](images/2019_09_11_1-24-16.png)
 
 當看到這個畫面時，就表示 Angular CLI 安裝成功了
 
